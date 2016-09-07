@@ -47,7 +47,7 @@ public class MainFrame extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Label", "SDI", "Pad", "SSM", "Parity"
+                "Label", "SDI", "Pad", "SSM 30 31", "Parity"
             }
         ) {
             Class[] types = new Class [] {
@@ -60,7 +60,6 @@ public class MainFrame extends javax.swing.JFrame {
         });
         table.setDoubleBuffered(true);
         table.setName(""); // NOI18N
-        table.setRowSelectionAllowed(true);
         table.getTableHeader().setReorderingAllowed(false);
         table.setVerifyInputWhenFocusTarget(false);
         jScrollPane1.setViewportView(table);
@@ -111,7 +110,7 @@ public class MainFrame extends javax.swing.JFrame {
 		rowData[0] = String.format("0%03o", word.getLabel() & 0xFF);
 		rowData[1] = Byte.toString(word.getSDI());
 		rowData[2] = String.format("0b%18s", Integer.toBinaryString(word.getPad())).replace(' ', '0');
-		rowData[3] = Byte.toString(word.getSSM());
+		rowData[3] = String.format("%d %d", word.getSSM() >> 1, word.getSSM() & 1);
 		rowData[4] = word.isParityCorrect() ? "OK" : "FAIL";
 		((DefaultTableModel)table.getModel()).addRow(rowData);
 	}
