@@ -74,7 +74,7 @@
                 <Column editable="true" title="Label" type="java.lang.String"/>
                 <Column editable="true" title="SDI" type="java.lang.String"/>
                 <Column editable="true" title="Pad" type="java.lang.String"/>
-                <Column editable="true" title="SSM" type="java.lang.String"/>
+                <Column editable="true" title="SSM 30 31" type="java.lang.String"/>
                 <Column editable="true" title="Parity" type="java.lang.String"/>
               </Table>
             </Property>
