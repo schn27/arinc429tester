@@ -1,10 +1,10 @@
-package com.transas.arinc429tester.bl;
+package schn27.arinc429tester;
 
-import com.transas.arinc429tester.ui.MainFrame;
+import schn27.arinc429tester.ui.MainFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class Arinc429Tester {
+public class Main {
 	public static void main(String args[]) {
 		setLookAndFeel();
 		MainFrame mainFrame = new MainFrame();

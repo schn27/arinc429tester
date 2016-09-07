@@ -1,8 +1,8 @@
-package com.transas.arinc429tester.ui;
+package schn27.arinc429tester.ui;
 
-import com.transas.arinc429tester.bl.Arinc429Word;
-import com.transas.arinc429tester.bl.Reader;
-import com.transas.serialport.ComPort;
+import schn27.arinc429tester.bl.Arinc429Word;
+import schn27.arinc429tester.bl.Reader;
+import schn27.serial.Com;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
@@ -11,11 +11,13 @@ public class MainFrame extends javax.swing.JFrame {
 
 	public MainFrame() {
 		initComponents();
-		List<String> ports = ComPort.getList();
+		List<String> ports = Com.getList();
 		@SuppressWarnings("unchecked")
 		DefaultComboBoxModel<String> m = (DefaultComboBoxModel<String>)portName.getModel();
 		for (String port : ports)
 			m.addElement(port);
+		
+		m.addElement("Fake");
 	}
 
 	@SuppressWarnings("unchecked")

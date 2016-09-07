@@ -1,4 +1,4 @@
-package com.transas.arinc429tester.bl;
+package schn27.arinc429tester.bl;
 
 public class Arinc429Word {
 	public Arinc429Word(int raw) {

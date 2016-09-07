@@ -1,6 +1,6 @@
-package com.transas.serialport;
+package schn27.serial;
 
-import com.transas.arinc429tester.bl.Arinc429Word;
+import schn27.arinc429tester.bl.Arinc429Word;
 import java.io.IOException;
 
 
@@ -8,7 +8,7 @@ import java.io.IOException;
  *
  * @author amalikov
  */
-public class FakePort implements SerialPort {
+public class FakePort implements Serial {
 
 	public FakePort() {
 		buffer = new byte[5];
@@ -22,10 +22,11 @@ public class FakePort implements SerialPort {
 	public void close() throws IOException {}
 
 	@Override
-	public int read(byte[] buffer, int ofs, int size, int timeout) {
+	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException {
 		for (int i = 0; i < size; ++i) {
-			if (pos >= this.buffer.length)
+			if (pos >= this.buffer.length) {
 				fillBuffer();
+			}
 
 			buffer[ofs + i] = this.buffer[pos++];
 		}
@@ -34,6 +35,9 @@ public class FakePort implements SerialPort {
 
 	@Override
 	public void write(byte[] buffer, int ofs, int size) {}
+	
+	@Override
+	public void clean() {}
 	
 	private void fillBuffer() {
 		try {
