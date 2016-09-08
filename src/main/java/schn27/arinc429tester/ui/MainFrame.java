@@ -14,8 +14,9 @@ public class MainFrame extends javax.swing.JFrame {
 		List<String> ports = Com.getList();
 		@SuppressWarnings("unchecked")
 		DefaultComboBoxModel<String> m = (DefaultComboBoxModel<String>)portName.getModel();
-		for (String port : ports)
+		for (String port : ports) {
 			m.addElement(port);
+		}
 		
 		m.addElement("Fake");
 	}
@@ -94,7 +95,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
 			((DefaultTableModel)table.getModel()).setRowCount(0);
-			reader = new Reader((String)portName.getSelectedItem(), (Arinc429Word word) -> {addWord(word);});
+			reader = new Reader((String)portName.getSelectedItem(), this::addWord);
 			(new Thread(reader)).start();
 		} else {
 			reader.stop();

@@ -35,15 +35,18 @@ public class Reader implements Runnable {
 	}
 	
 	private void open() throws IOException {
-		if (opened)
+		if (opened) {
 			return;
+		}
+		
 		comPort.open();
 		opened = true;
 	}
 	
 	private void close() {
-		if (!opened)
+		if (!opened) {
 			return;
+		}
 		
 		if (comPort != null) {
 			try {
@@ -58,18 +61,21 @@ public class Reader implements Runnable {
 	private int readWord() throws TimeoutException, InterruptedException {
 		int pos = 0;
 		while (pos < buffer.length) {
-			if  (comPort.read(buffer, pos, 1, 1000) != 1)
+			if  (comPort.read(buffer, pos, 1, 1000) != 1) {
 				throw new TimeoutException();
+			}
 			
-			if (buffer[0] >= 0 || (pos != 0 && buffer[pos] < 0))
+			if (buffer[0] >= 0 || (pos != 0 && buffer[pos] < 0)) {
 				pos = 0;
-			else
+			} else {
 				++pos;
+			}
 		}
 	
 		long t = 0;
-		for (byte b : buffer)
+		for (byte b : buffer) {
 			t = (t << 7) | ((int)b & 0x7f);
+		}
 
 		t >>= 3;
 		

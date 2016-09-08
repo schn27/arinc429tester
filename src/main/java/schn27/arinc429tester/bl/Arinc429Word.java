@@ -11,8 +11,9 @@ public class Arinc429Word {
 				((pad & ((1 << 18) - 1)) << 10) | 
 				((ssm & 3) << 29)) & 0x7FFFFFFF;
 		
-		if (!getParity(v))
+		if (!getParity(v)) {
 			v |= (1 << 31);
+		}
 		
 		raw = v;
 	}
