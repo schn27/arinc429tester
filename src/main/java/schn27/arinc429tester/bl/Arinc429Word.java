@@ -22,8 +22,8 @@ public class Arinc429Word {
 		return getWordParity(raw);
 	}
 	
-	public boolean getParity() {
-		return ((raw >> 31) & 1) == 1;
+	public byte getParity() {
+		return (byte)((raw >> 31) & 1);
 	}
 	
 	public byte getSSM() {
