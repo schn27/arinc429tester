@@ -1,11 +1,11 @@
 package schn27.arinc429tester.ui;
 
-import schn27.arinc429tester.bl.Arinc429Word;
 import schn27.arinc429tester.bl.Reader;
 import schn27.serial.Com;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.table.DefaultTableModel;
+import schn27.arinc429tester.bl.Arinc429TableModel;
+import schn27.arinc429tester.bl.Sequence;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -19,6 +19,11 @@ public class MainFrame extends javax.swing.JFrame {
 		}
 		
 		m.addElement("Fake");
+		
+		sequence = new Sequence();
+		Arinc429TableModel tableModel = new Arinc429TableModel();
+		tableModel.setSequence(sequence);
+		table.setModel(tableModel);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -48,17 +53,9 @@ public class MainFrame extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Label", "SDI", "Pad", "SSM 30 31", "Parity"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
             }
-        });
+        ));
         table.setDoubleBuffered(true);
         table.setName(""); // NOI18N
         table.getTableHeader().setReorderingAllowed(false);
@@ -94,8 +91,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
-			((DefaultTableModel)table.getModel()).setRowCount(0);
-			reader = new Reader((String)portName.getSelectedItem(), this::addWord);
+			sequence.clear();
+			reader = new Reader((String)portName.getSelectedItem(), sequence::put);
 			(new Thread(reader)).start();
 		} else {
 			reader.stop();
@@ -106,16 +103,6 @@ public class MainFrame extends javax.swing.JFrame {
 		btnOpen.setText(reader == null ? "Open" : "Close");
     }//GEN-LAST:event_btnOpenActionPerformed
 
-	private void addWord(Arinc429Word word) {
-		String[] rowData = new String[6];
-		rowData[0] = String.format("0%03o", word.getLabel() & 0xFF);
-		rowData[1] = Byte.toString(word.getSDI());
-		rowData[2] = String.format("0b%18s", Integer.toBinaryString(word.getPad())).replace(' ', '0');
-		rowData[3] = String.format("%d %d", word.getSSM() >> 1, word.getSSM() & 1);
-		rowData[4] = String.format("%s %d", word.isParityCorrect(true) ? "OK" : "FAIL", word.getParity());
-		((DefaultTableModel)table.getModel()).addRow(rowData);
-	}
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOpen;
     private javax.swing.JScrollPane jScrollPane1;
@@ -123,5 +110,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 
+	private final Sequence sequence;
 	private Reader reader;
 }
