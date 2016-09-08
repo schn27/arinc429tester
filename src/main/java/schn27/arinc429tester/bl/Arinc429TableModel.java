@@ -12,8 +12,16 @@ import javax.swing.table.AbstractTableModel;
  * @author amalikov
  */
 public class Arinc429TableModel extends AbstractTableModel implements SequenceChangedListener {
+	public static final int LABEL = 0;
+	public static final int SDI = 1;
+	public static final int PAD = 2;
+	public static final int SSM = 3;
+	public static final int PARITY = 4;
+	public static final int COLUMN_COUNT = 5;
+	
 	public Arinc429TableModel() {
 		this.sequence = null;
+		parityModeOdd = true;
 	}
 	
 	@Override
@@ -42,7 +50,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		case SSM:
 			return "SSM 30 31";
 		case PARITY:
-			return "Parity";
+			return String.format("Parity (%s)", parityModeOdd ? "Odd*" : "Even");
 		}
 
 		return null;
@@ -91,7 +99,12 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	@Override
 	public void onSequenceCleared() {
 		fireTableDataChanged();
-	}	
+	}
+	
+	public void toggleParityMode() {
+		parityModeOdd = !parityModeOdd;
+		fireTableStructureChanged();
+	}
 	
 	private String getLabelTextFrom(Arinc429Word word) {
 		return String.format("%03o", word.getLabel() & 0xFF);
@@ -110,15 +123,9 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	}
 
 	private String getParityTextFrom(Arinc429Word word) {
-		return String.format("%s %d", word.isParityCorrect(true) ? "OK" : "FAIL", word.getParity());
+		return String.format("%s %d", word.isParityCorrect(parityModeOdd) ? "OK" : "FAIL", word.getParity());
 	}
 	
-	private static final int LABEL = 0;
-	private static final int SDI = 1;
-	private static final int PAD = 2;
-	private static final int SSM = 3;
-	private static final int PARITY = 4;
-	private static final int COLUMN_COUNT = 5;
-	
 	private Sequence sequence;
+	private boolean parityModeOdd;
 }

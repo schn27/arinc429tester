@@ -1,5 +1,7 @@
 package schn27.arinc429tester.ui;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import schn27.arinc429tester.bl.Reader;
 import schn27.serial.Com;
 import java.util.List;
@@ -24,6 +26,17 @@ public class MainFrame extends javax.swing.JFrame {
 		Arinc429TableModel tableModel = new Arinc429TableModel();
 		tableModel.setSequence(sequence);
 		table.setModel(tableModel);
+		
+		table.getTableHeader().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
+				int col = table.columnAtPoint(e.getPoint());
+				if (col == Arinc429TableModel.PARITY) {
+					m.toggleParityMode();
+				}
+			}
+		});		
 	}
 
 	@SuppressWarnings("unchecked")
