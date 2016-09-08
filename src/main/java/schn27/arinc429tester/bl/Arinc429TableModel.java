@@ -50,7 +50,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		case SSM:
 			return "SSM 30 31";
 		case PARITY:
-			return String.format("Parity (%s)", parityModeOdd ? "Odd*" : "Even");
+			return String.format("Par (%s)", parityModeOdd ? "Odd*" : "Even");
 		}
 
 		return null;
