@@ -18,8 +18,8 @@ public class Arinc429Word {
 		raw = v;
 	}
 	
-	public boolean isParityCorrect() {
-		return getWordParity(raw);
+	public boolean isParityCorrect(boolean odd) {
+		return getWordParity(raw) ^ !odd;
 	}
 	
 	public byte getParity() {
