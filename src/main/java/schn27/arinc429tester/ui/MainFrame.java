@@ -112,7 +112,7 @@ public class MainFrame extends javax.swing.JFrame {
 		rowData[1] = Byte.toString(word.getSDI());
 		rowData[2] = String.format("0b%18s", Integer.toBinaryString(word.getPad())).replace(' ', '0');
 		rowData[3] = String.format("%d %d", word.getSSM() >> 1, word.getSSM() & 1);
-		rowData[4] = word.isParityCorrect() ? "OK" : "FAIL";
+		rowData[4] = String.format("%s %d", word.isParityCorrect() ? "OK" : "FAIL", word.getParity());
 		((DefaultTableModel)table.getModel()).addRow(rowData);
 	}
 
