@@ -12,17 +12,24 @@ import schn27.arinc429tester.bl.Sequence;
 public class MainFrame extends javax.swing.JFrame {
 
 	public MainFrame() {
+		sequence = new Sequence();
+		
 		initComponents();
+		initPortList();
+		initTable();
+	}
+
+	private void initPortList() {
 		List<String> ports = Com.getList();
-		@SuppressWarnings("unchecked")
 		DefaultComboBoxModel<String> m = (DefaultComboBoxModel<String>)portName.getModel();
 		for (String port : ports) {
 			m.addElement(port);
 		}
 		
 		m.addElement("Fake");
-		
-		sequence = new Sequence();
+	}
+
+	private void initTable() {
 		Arinc429TableModel tableModel = new Arinc429TableModel();
 		tableModel.setSequence(sequence);
 		table.setModel(tableModel);
@@ -36,7 +43,7 @@ public class MainFrame extends javax.swing.JFrame {
 					m.toggleParityMode();
 				}
 			}
-		});		
+		});
 	}
 
 	@SuppressWarnings("unchecked")
