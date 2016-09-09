@@ -22,6 +22,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	public Arinc429TableModel() {
 		this.sequence = null;
 		parityModeOdd = true;
+		labelNumberSystem = NumberSystem.OCT;
 	}
 	
 	@Override
@@ -42,7 +43,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	public String getColumnName(int col) {
 		switch (col) {
 		case LABEL:
-			return "Label";
+			return String.format("Label (%s)", labelNumberSystem);
 		case SDI:
 			return "SDI";
 		case PAD:
@@ -107,7 +108,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	}
 	
 	private String getLabelTextFrom(Arinc429Word word) {
-		return String.format("%03o", word.getLabel() & 0xFF);
+		return labelNumberSystem.integerToString(word.getLabel() & 0xFF, 8);
 	}
 
 	private String getSdiTextFrom(Arinc429Word word) {
@@ -128,4 +129,5 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	
 	private Sequence sequence;
 	private boolean parityModeOdd;
+	private NumberSystem labelNumberSystem;
 }
