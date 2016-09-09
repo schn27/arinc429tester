@@ -91,7 +91,16 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		
 		this.sequence.addListener(this);
 	}
-
+	
+	public NumberSystem getLabelNumberSystem() {
+		return labelNumberSystem;
+	}
+	
+	public void setLabelNumberSystem(NumberSystem labelNumberSystem) {
+		this.labelNumberSystem = labelNumberSystem;
+		fireTableStructureChanged();
+	}
+	
 	@Override
 	public void onSequenceAdded(int size) {
 		fireTableRowsInserted(size - 1, size - 1);

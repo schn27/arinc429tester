@@ -40,5 +40,20 @@ public enum NumberSystem {
 		return null;
 	}
 	
+	public int parseInteger(String str) throws NumberFormatException {
+		switch (this) {
+		case BIN:
+			return Integer.parseInt(str, 2);
+		case OCT:
+			return Integer.parseInt(str, 8);
+		case DEC:
+			return Integer.parseInt(str, 10);
+		case HEX:
+			return Integer.parseInt(str, 16);
+		}
+		
+		return -1;
+	}
+	
 	private final String title;
 }
