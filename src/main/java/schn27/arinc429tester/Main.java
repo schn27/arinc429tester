@@ -13,7 +13,7 @@ public class Main {
 
 	private static void setLookAndFeel() {
 		try {
-			UIManager.setLookAndFeel(UIManager.getInstalledLookAndFeels()[1].getClassName());
+			UIManager.setLookAndFeel(UIManager.getInstalledLookAndFeels()[3].getClassName());
 		} catch (UnsupportedLookAndFeelException | ArrayIndexOutOfBoundsException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
 		}
 	}
