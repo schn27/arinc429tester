@@ -6,7 +6,7 @@
 package schn27.arinc429tester.ui;
 
 import javax.swing.table.DefaultTableModel;
-import schn27.arinc429tester.bl.LabelFilterConfig;
+import schn27.arinc429tester.bl.LabelFilter;
 import schn27.arinc429tester.bl.NumberSystem;
 
 /**
@@ -18,13 +18,17 @@ public class LabelFilterDialog extends javax.swing.JDialog {
 	/**
 	 * Creates new form LabelFilterDialog
 	 */
-	public LabelFilterDialog(java.awt.Frame parent, boolean modal, LabelFilterConfig config) {
+	public LabelFilterDialog(java.awt.Frame parent, boolean modal, LabelFilter filter) {
 		super(parent, modal);
-		this.config = config;
+		this.filter = new LabelFilter(filter);
 		initComponents();
 		updateModeButton();
 		updateSystemButton();
 		writeTable();
+	}
+	
+	public LabelFilter getLabelFilter() {
+		return filter;
 	}
 
 	/**
@@ -153,28 +157,28 @@ public class LabelFilterDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModeActionPerformed
-        config.includeMode = !config.includeMode;
+        filter.includeMode = !filter.includeMode;
 		updateModeButton();
     }//GEN-LAST:event_btnModeActionPerformed
 
     private void btnSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSystemActionPerformed
 		readTable();
 		
-		switch (config.numberSystem) {
+		switch (filter.numberSystem) {
 		case BIN:
-			config.numberSystem = NumberSystem.OCT;
+			filter.numberSystem = NumberSystem.OCT;
 			break;
 		case OCT:
-			config.numberSystem = NumberSystem.DEC;
+			filter.numberSystem = NumberSystem.DEC;
 			break;
 		case DEC:
-			config.numberSystem = NumberSystem.HEX;
+			filter.numberSystem = NumberSystem.HEX;
 			break;
 		case HEX:
-			config.numberSystem = NumberSystem.BIN;
+			filter.numberSystem = NumberSystem.BIN;
 			break;
 		default:
-			config.numberSystem = NumberSystem.OCT;
+			filter.numberSystem = NumberSystem.OCT;
 		}
 		
 		writeTable();
@@ -187,19 +191,19 @@ public class LabelFilterDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnOkActionPerformed
 
 	private void updateModeButton() {
-		btnMode.setText(config.includeMode ? "Include" : "Exclude");
+		btnMode.setText(filter.includeMode ? "Include" : "Exclude");
 	}
 	
 	private void updateSystemButton() {
-		btnSystem.setText(config.numberSystem.toString());
+		btnSystem.setText(filter.numberSystem.toString());
 	}
 	
 	private void writeTable() {
 		DefaultTableModel m = (DefaultTableModel)filterTable.getModel();
 		int row = 0;
 		int col = 0;
-		for (int label : config.labels) {
-			m.setValueAt(label != -1 ? config.numberSystem.integerToString(label, 8) : "", row, col);
+		for (int label : filter.getLabels()) {
+			m.setValueAt(label != -1 ? filter.numberSystem.integerToString(label, 8) : "", row, col);
 			
 			if (++col >= 4) {
 				col = 0;
@@ -214,9 +218,10 @@ public class LabelFilterDialog extends javax.swing.JDialog {
 		DefaultTableModel m = (DefaultTableModel)filterTable.getModel();
 		int row = 0;
 		int col = 0;
-		for (int i = 0; i < config.labels.length; ++i) {
+		int[] labels = new int[16];
+		for (int i = 0; i < labels.length; ++i) {
 			String str = (String)m.getValueAt(row, col);
-			config.labels[i] = parseValue((String)m.getValueAt(row, col));
+			labels[i] = parseValue((String)m.getValueAt(row, col));
 			
 			if (++col >= 4) {
 				col = 0;
@@ -224,12 +229,15 @@ public class LabelFilterDialog extends javax.swing.JDialog {
 					break;
 				}
 			}
-		}		
+		}
+		
+		filter.setLabels(labels);
 	}
 	
 	private int parseValue(String str) {
 		try {
-			return (str == null || str.isEmpty()) ? -1 : config.numberSystem.parseInteger(str);
+			int value = (str == null || str.isEmpty()) ? -1 : filter.numberSystem.parseInteger(str);
+			return value < 256 ? value : -1;
 		} catch (NumberFormatException ex) {
 			return -1;
 		}
@@ -241,5 +249,5 @@ public class LabelFilterDialog extends javax.swing.JDialog {
     private javax.swing.JTable filterTable;
     // End of variables declaration//GEN-END:variables
 
-	private final LabelFilterConfig config;
+	private final LabelFilter filter;
 }

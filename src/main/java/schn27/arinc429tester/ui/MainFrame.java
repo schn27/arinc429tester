@@ -8,14 +8,17 @@ import schn27.serial.Com;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import schn27.arinc429tester.bl.Arinc429TableModel;
-import schn27.arinc429tester.bl.LabelFilterConfig;
+import schn27.arinc429tester.bl.FilteredSequence;
+import schn27.arinc429tester.bl.LabelFilter;
 import schn27.arinc429tester.bl.Sequence;
 
 public class MainFrame extends javax.swing.JFrame {
 
 	public MainFrame() {
+		filter = new LabelFilter();
 		sequence = new Sequence();
-		labelFilterConfig = new LabelFilterConfig();
+		filteredSequence = new FilteredSequence(sequence);
+		filteredSequence.setFilter(filter);
 		
 		initComponents();
 		initPortList();
@@ -35,7 +38,7 @@ public class MainFrame extends javax.swing.JFrame {
 
 	private void initTable() {
 		Arinc429TableModel tableModel = new Arinc429TableModel();
-		tableModel.setSequence(sequence);
+		tableModel.setSequence(filteredSequence);
 		table.setModel(tableModel);
 		
 		table.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -46,22 +49,23 @@ public class MainFrame extends javax.swing.JFrame {
 				if (col == Arinc429TableModel.PARITY) {
 					m.toggleParityMode();
 				} else if (col == Arinc429TableModel.LABEL) {
-					LabelFilterDialog dlg = new LabelFilterDialog(MainFrame.this, true, labelFilterConfig);
+					LabelFilterDialog dlg = new LabelFilterDialog(MainFrame.this, true, filter);
 					Rectangle rect = dlg.getBounds();
 					rect.x = e.getXOnScreen();
 					rect.y = e.getYOnScreen();
 					dlg.setBounds(rect);
 					dlg.setVisible(true);
-					m.setLabelNumberSystem(labelFilterConfig.numberSystem);
+					filter = dlg.getLabelFilter();
+					m.setLabelNumberSystem(filter.numberSystem);
 					updateStatusBar();
+					filteredSequence.setFilter(filter);
 				}
 			}
 		});
 	}
 	
 	private void updateStatusBar() {
-		statusBar.setText(labelFilterConfig.toString());
-		System.out.println(labelFilterConfig);
+		statusBar.setText(filter.toString());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -137,7 +141,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
 			sequence.clear();
-			reader = new Reader((String)portName.getSelectedItem(), sequence::put);
+			reader = new Reader((String)portName.getSelectedItem(), filteredSequence::put);
 			(new Thread(reader)).start();
 		} else {
 			reader.stop();
@@ -157,6 +161,7 @@ public class MainFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
 	private final Sequence sequence;
+	private final FilteredSequence filteredSequence;
 	private Reader reader;
-	private final LabelFilterConfig labelFilterConfig;
+	private LabelFilter filter;
 }
