@@ -45,7 +45,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		case LABEL:
 			return String.format("Label (%s)", labelNumberSystem);
 		case SDI:
-			return "SDI";
+			return "SDI 9 10";
 		case PAD:
 			return "PAD";
 		case SSM:
@@ -121,7 +121,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	}
 
 	private String getSdiTextFrom(Arinc429Word word) {
-		return String.format("%d", word.getSDI());
+		return String.format("%d %d", word.getSSM() >> 1, word.getSSM() & 1);
 	}
 
 	private String getPadTextFrom(Arinc429Word word) {
