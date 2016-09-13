@@ -1,4 +1,4 @@
-package com.transas.arinc429tester.bl;
+package schn27.arinc429tester.bl;
 
 public class Arinc429Word {
 	public Arinc429Word(int raw) {
@@ -11,14 +11,19 @@ public class Arinc429Word {
 				((pad & ((1 << 18) - 1)) << 10) | 
 				((ssm & 3) << 29)) & 0x7FFFFFFF;
 		
-		if (!getParity(v))
+		if (!getWordParity(v)) {
 			v |= (1 << 31);
+		}
 		
 		raw = v;
 	}
 	
-	public boolean isParityCorrect() {
-		return getParity(raw);
+	public boolean isParityCorrect(boolean odd) {
+		return getWordParity(raw) ^ !odd;
+	}
+	
+	public byte getParity() {
+		return (byte)((raw >> 31) & 1);
 	}
 	
 	public byte getSSM() {
@@ -37,7 +42,7 @@ public class Arinc429Word {
 		return reverseByte((byte)(raw & 0xFF));
 	}
 	
-	private boolean getParity(int value) {
+	private boolean getWordParity(int value) {
 		int x = (value ^ (value >> 16)) & 0xFFFF;
 		x = (x ^ (x >> 8)) & 0xFF;
 		x = (x ^ (x >> 4)) & 0x0F;

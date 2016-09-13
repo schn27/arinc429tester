@@ -1,13 +1,14 @@
-package com.transas.arinc429tester.bl;
+package schn27.arinc429tester.bl;
 
-import com.transas.serialport.ComPort;
-import com.transas.serialport.SerialPort;
+import schn27.serial.Com;
+import schn27.serial.Serial;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import schn27.serial.FakePort;
 
 public class Reader implements Runnable {
 	public Reader(String portName, Arinc429WordConsumer consumer) {
-		comPort = ComPort.create(portName, 230400);
+		comPort = portName.equals("Fake") ? new FakePort() : new Com(portName, 230400);
 		this.consumer = consumer;
 		isRunning = true;
 		opened = false;
@@ -20,7 +21,7 @@ public class Reader implements Runnable {
 			try {
 				open();
 				consumer.consume(new Arinc429Word(readWord()));
-			} catch(TimeoutException ex) {
+			} catch(TimeoutException | InterruptedException ex) {
 			} catch (IOException ex) {
 				System.err.println("IO exception: " + ex.getMessage());
 			}
@@ -34,15 +35,18 @@ public class Reader implements Runnable {
 	}
 	
 	private void open() throws IOException {
-		if (opened)
+		if (opened) {
 			return;
+		}
+		
 		comPort.open();
 		opened = true;
 	}
 	
 	private void close() {
-		if (!opened)
+		if (!opened) {
 			return;
+		}
 		
 		if (comPort != null) {
 			try {
@@ -54,21 +58,24 @@ public class Reader implements Runnable {
 		opened = false;
 	}
 	
-	private int readWord() throws TimeoutException {
+	private int readWord() throws TimeoutException, InterruptedException {
 		int pos = 0;
 		while (pos < buffer.length) {
-			if  (comPort.read(buffer, pos, 1, 1000) != 1)
+			if  (comPort.read(buffer, pos, 1, 1000) != 1) {
 				throw new TimeoutException();
+			}
 			
-			if (buffer[0] >= 0 || (pos != 0 && buffer[pos] < 0))
+			if (buffer[0] >= 0 || (pos != 0 && buffer[pos] < 0)) {
 				pos = 0;
-			else
+			} else {
 				++pos;
+			}
 		}
 	
 		long t = 0;
-		for (byte b : buffer)
+		for (byte b : buffer) {
 			t = (t << 7) | ((int)b & 0x7f);
+		}
 
 		t >>= 3;
 		
@@ -84,7 +91,7 @@ public class Reader implements Runnable {
 		
 	private final Arinc429WordConsumer consumer;
 	private volatile boolean isRunning;
-	private final SerialPort comPort;
+	private final Serial comPort;
 	private boolean opened;
 	private final byte[] buffer;
 }
