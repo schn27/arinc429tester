@@ -8,7 +8,7 @@ public class Arinc429Word {
 	public Arinc429Word(byte label, byte sdi, int data, byte ssm) {
 		int v = ((reverseBits(label) & 0xFF) | 
 				((sdi & 3) << 8) | 
-				((data & ((1 << 18) - 1)) << 10) | 
+				((data & ((1 << 19) - 1)) << 10) | 
 				((ssm & 3) << 29)) & 0x7FFFFFFF;
 		
 		if (!getWordParity(v)) {
@@ -31,7 +31,7 @@ public class Arinc429Word {
 	}
 	
 	public int getData() {
-		return (raw >> 10) & ((1 << 18) - 1);
+		return (raw >> 10) & ((1 << 19) - 1);
 	}
 	
 	public byte getSDI() {

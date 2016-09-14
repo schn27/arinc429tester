@@ -125,7 +125,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	}
 
 	private String getPadTextFrom(Arinc429Word word) {
-		return String.format("%18s", Integer.toBinaryString(word.getData())).replace(' ', '0');
+		return String.format("%19s", Integer.toBinaryString(word.getData())).replace(' ', '0');
 	}
 
 	private String getSsmTextFrom(Arinc429Word word) {
