@@ -26,7 +26,7 @@ public class Arinc429Word {
 		return (byte)((raw >> 31) & 1);
 	}
 	
-	public byte getSSM() {
+	public byte getSsm() {
 		return (byte)((raw >> 29) & 3);
 	}
 	
@@ -34,7 +34,7 @@ public class Arinc429Word {
 		return (raw >> 10) & ((1 << 19) - 1);
 	}
 	
-	public byte getSDI() {
+	public byte getSdi() {
 		return (byte)((raw >> 8) & 3);
 	}
 	
