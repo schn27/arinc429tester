@@ -3,6 +3,7 @@ package schn27.arinc429tester.ui;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.BitSet;
 import schn27.arinc429tester.bl.Reader;
 import schn27.serial.Com;
 import java.util.List;
@@ -19,6 +20,7 @@ public class MainFrame extends javax.swing.JFrame {
 		sequence = new Sequence();
 		filteredSequence = new FilteredSequence(sequence);
 		filteredSequence.setFilter(filter);
+		noSdiWords = new BitSet(256);
 		
 		initComponents();
 		initPortList();
@@ -40,7 +42,11 @@ public class MainFrame extends javax.swing.JFrame {
 		Arinc429TableModel tableModel = new Arinc429TableModel();
 		tableModel.setSequence(filteredSequence);
 		table.setModel(tableModel);
-		
+		setTableHeaderClickHandler();
+		setTableRowClickHandler();
+	}
+	
+	private void setTableHeaderClickHandler() {
 		table.getTableHeader().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -61,8 +67,26 @@ public class MainFrame extends javax.swing.JFrame {
 					filteredSequence.setFilter(filter);
 				}
 			}
-		});
+		});		
 	}
+	
+	private void setTableRowClickHandler() {
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = table.rowAtPoint(e.getPoint());
+				byte label = filteredSequence.get(row).word.getLabel();
+				if (noSdiWords.get(label & 0xFF)) {
+					noSdiWords.set(label & 0xFF, false);
+				} else {
+					noSdiWords.set(label & 0xFF, true);
+				}
+				
+				final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
+				m.setNoSdiWords(noSdiWords);
+			}
+		});		
+	}	
 	
 	private void updateStatusBar() {
 		statusBar.setText(filter.toString());
@@ -140,7 +164,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
-			sequence.clear();
+			filteredSequence.clear();
 			reader = new Reader((String)portName.getSelectedItem(), filteredSequence::put);
 			(new Thread(reader)).start();
 		} else {
@@ -164,4 +188,5 @@ public class MainFrame extends javax.swing.JFrame {
 	private final FilteredSequence filteredSequence;
 	private Reader reader;
 	private LabelFilter filter;
+	private BitSet noSdiWords;
 }
