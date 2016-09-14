@@ -140,7 +140,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
-			sequence.clear();
+			filteredSequence.clear();
 			reader = new Reader((String)portName.getSelectedItem(), filteredSequence::put);
 			(new Thread(reader)).start();
 		} else {
