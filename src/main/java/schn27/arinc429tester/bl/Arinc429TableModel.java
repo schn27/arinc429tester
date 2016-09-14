@@ -45,11 +45,11 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		case LABEL:
 			return String.format("Label (%s)", labelNumberSystem);
 		case SDI:
-			return "SDI 9 10";
+			return "SDI 10 9";
 		case PAD:
-			return "PAD";
+			return "Data";
 		case SSM:
-			return "SSM 30 31";
+			return "SSM 31 30";
 		case PARITY:
 			return String.format("Par (%s)", parityModeOdd ? "Odd*" : "Even");
 		}
