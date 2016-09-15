@@ -32,9 +32,13 @@
               <Component id="portName" min="-2" pref="83" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btnOpen" min="-2" pref="74" max="-2" attributes="0"/>
-              <EmptySpace pref="419" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="btnResetTime" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnResetPeriod" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
-          <Component id="jScrollPane1" alignment="1" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="1" pref="582" max="32767" attributes="0"/>
           <Component id="statusBar" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
@@ -44,6 +48,8 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnOpen" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="portName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnResetTime" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnResetPeriod" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane1" max="32767" attributes="0"/>
@@ -106,6 +112,31 @@
         <Property name="text" type="java.lang.String" value="345"/>
         <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnResetTime">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Reset Time"/>
+        <Property name="toolTipText" type="java.lang.String" value=""/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnResetTimeActionPerformed"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnResetPeriod">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Reset Period"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnResetPeriodActionPerformed"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

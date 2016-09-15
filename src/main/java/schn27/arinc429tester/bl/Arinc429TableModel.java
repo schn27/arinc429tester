@@ -5,7 +5,15 @@
  */
 package schn27.arinc429tester.bl;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -13,17 +21,20 @@ import javax.swing.table.AbstractTableModel;
  * @author amalikov
  */
 public class Arinc429TableModel extends AbstractTableModel implements SequenceChangedListener {
-	public static final int LABEL = 0;
-	public static final int SDI = 1;
-	public static final int DATA = 2;
-	public static final int SSM = 3;
-	public static final int PARITY = 4;
-	public static final int COLUMN_COUNT = 5;
+	public static final int TIME = 0;
+	public static final int PERIOD = 1;
+	public static final int LABEL = 2;
+	public static final int SDI = 3;
+	public static final int DATA = 4;
+	public static final int SSM = 5;
+	public static final int PARITY = 6;
+	public static final int COLUMN_COUNT = 7;
 	
 	public Arinc429TableModel() {
 		this.sequence = null;
 		parityModeOdd = true;
 		labelNumberSystem = NumberSystem.OCT;
+		referenceDate = Calendar.getInstance().getTime();
 	}
 	
 	@Override
@@ -43,6 +54,10 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	@Override
 	public String getColumnName(int col) {
 		switch (col) {
+		case TIME:
+			return String.format("Time (%s)", timeModeAbsolute ? "Abs" : "Start");
+		case PERIOD:
+			return String.format("Period (%s)", periodModeMin ? "Min" : "Max");
 		case LABEL:
 			return String.format("Label (%s)", labelNumberSystem);
 		case SDI:
@@ -67,6 +82,10 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		TimeMarkedArinc429Word value = sequence.get(row);
 		
 		switch (col) {
+		case TIME:
+			return getTimeTextFrom(value.timemark);
+		case PERIOD:
+			return "n/a";
 		case LABEL:
 			return getLabelTextFrom(value.word);
 		case SDI:
@@ -122,6 +141,40 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		fireTableDataChanged();
 	}
 	
+	public void toggleTimeMode() {
+		timeModeAbsolute = !timeModeAbsolute;
+		fireTableStructureChanged();
+	}
+	
+	public void togglePeriodMode() {
+		periodModeMin = !periodModeMin;
+		fireTableStructureChanged();
+	}
+	
+	public void setStartTime(Date referenceDate) {
+		this.referenceDate = referenceDate;
+		if (!timeModeAbsolute) {
+			fireTableDataChanged();
+		}
+	}
+	
+	private String getTimeTextFrom(Date timemark) {
+		if (timeModeAbsolute) {
+			Instant t = timemark.toInstant();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss", Locale.ENGLISH);
+			return t.atZone(ZoneId.of("UTC").normalized()).format(formatter);
+		} else {
+			long t = Duration.between(referenceDate.toInstant(), timemark.toInstant()).toMillis() / 1000;
+			boolean negative = t < 0;
+			t = Math.abs(t);
+			int ts = (int)(t % 60);
+			int tm = (int)((t / 60) % 60);
+			int th = (int)(t / 3600);
+			
+			return String.format("%s%02d:%02d:%02d", negative ? "-" : "", th, tm, ts);
+		}
+	}
+	
 	private String getLabelTextFrom(Arinc429Word word) {
 		return labelNumberSystem.integerToString(word.getLabel() & 0xFF, 8);
 	}
@@ -150,4 +203,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	private boolean parityModeOdd;
 	private NumberSystem labelNumberSystem;
 	private BitSet noSdiWords;
+	private boolean timeModeAbsolute;
+	private boolean periodModeMin;
+	private Date referenceDate;
 }
