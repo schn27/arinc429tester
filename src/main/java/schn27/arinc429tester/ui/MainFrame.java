@@ -74,16 +74,18 @@ public class MainFrame extends javax.swing.JFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int row = table.rowAtPoint(e.getPoint());
-				byte label = filteredSequence.get(row).word.getLabel();
-				if (noSdiWords.get(label & 0xFF)) {
-					noSdiWords.set(label & 0xFF, false);
-				} else {
-					noSdiWords.set(label & 0xFF, true);
-				}
+				if (table.columnAtPoint(e.getPoint()) == Arinc429TableModel.SDI) {
+					int row = table.rowAtPoint(e.getPoint());
+					byte label = filteredSequence.get(row).word.getLabel();
+					if (noSdiWords.get(label & 0xFF)) {
+						noSdiWords.set(label & 0xFF, false);
+					} else {
+						noSdiWords.set(label & 0xFF, true);
+					}
 				
-				final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
-				m.setNoSdiWords(noSdiWords);
+					final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
+					m.setNoSdiWords(noSdiWords);
+				}
 			}
 		});		
 	}	
