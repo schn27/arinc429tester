@@ -1,6 +1,9 @@
 package schn27.arinc429tester.ui;
 
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.BitSet;
@@ -9,6 +12,7 @@ import schn27.serial.Com;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import schn27.arinc429tester.bl.Arinc429TableModel;
+import schn27.arinc429tester.bl.Arinc429Word;
 import schn27.arinc429tester.bl.FilteredSequence;
 import schn27.arinc429tester.bl.LabelFilter;
 import schn27.arinc429tester.bl.Sequence;
@@ -42,8 +46,35 @@ public class MainFrame extends javax.swing.JFrame {
 		Arinc429TableModel tableModel = new Arinc429TableModel();
 		tableModel.setSequence(filteredSequence);
 		table.setModel(tableModel);
+		setTableAutoScrollHandler();
 		setTableHeaderClickHandler();
 		setTableRowClickHandler();
+	}
+
+	private void setTableAutoScrollHandler() {
+		table.addComponentListener(new ComponentListener() {
+			@Override
+			public void componentResized(ComponentEvent ce) {
+				Rectangle viewRect = tableScrollPane.getViewport().getViewRect();
+				int last = table.rowAtPoint(new Point(0, viewRect.y + viewRect.height - 1));
+				
+				if (last >= table.getRowCount() - 2) {
+					table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
+				}				
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent ce) {
+			}
+
+			@Override
+			public void componentShown(ComponentEvent ce) {
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent ce) {
+			}
+		});
 	}
 	
 	private void setTableHeaderClickHandler() {
@@ -93,13 +124,13 @@ public class MainFrame extends javax.swing.JFrame {
 	private void updateStatusBar() {
 		statusBar.setText(filter.toString());
 	}
-
+	
 	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         btnOpen = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        tableScrollPane = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         portName = new javax.swing.JComboBox();
         statusBar = new javax.swing.JLabel();
@@ -129,7 +160,7 @@ public class MainFrame extends javax.swing.JFrame {
         table.setName(""); // NOI18N
         table.getTableHeader().setReorderingAllowed(false);
         table.setVerifyInputWhenFocusTarget(false);
-        jScrollPane1.setViewportView(table);
+        tableScrollPane.setViewportView(table);
         if (table.getColumnModel().getColumnCount() > 0) {
             table.getColumnModel().getColumn(0).setResizable(false);
         }
@@ -146,7 +177,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(419, Short.MAX_VALUE))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -156,7 +187,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(btnOpen)
                     .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1)
+                .addComponent(tableScrollPane)
                 .addGap(0, 0, 0)
                 .addComponent(statusBar))
         );
@@ -167,7 +198,9 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
 			filteredSequence.clear();
-			reader = new Reader((String)portName.getSelectedItem(), filteredSequence::put);
+			reader = new Reader((String)portName.getSelectedItem(), (Arinc429Word word) -> {
+				java.awt.EventQueue.invokeLater(() -> {filteredSequence.put(word);});
+			});
 			(new Thread(reader)).start();
 		} else {
 			reader.stop();
@@ -180,15 +213,15 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOpen;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox portName;
     private javax.swing.JLabel statusBar;
     private javax.swing.JTable table;
+    private javax.swing.JScrollPane tableScrollPane;
     // End of variables declaration//GEN-END:variables
 
 	private final Sequence sequence;
 	private final FilteredSequence filteredSequence;
 	private Reader reader;
 	private LabelFilter filter;
-	private BitSet noSdiWords;
+	private final BitSet noSdiWords;
 }
