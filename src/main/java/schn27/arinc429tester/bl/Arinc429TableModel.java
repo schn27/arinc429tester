@@ -9,10 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
@@ -34,7 +31,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		this.sequence = null;
 		parityModeOdd = true;
 		labelNumberSystem = NumberSystem.OCT;
-		referenceDate = Calendar.getInstance().getTime();
+		referenceTime = Instant.now();
 	}
 	
 	@Override
@@ -151,20 +148,19 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		fireTableStructureChanged();
 	}
 	
-	public void setStartTime(Date referenceDate) {
-		this.referenceDate = referenceDate;
+	public void setStartTime(Instant referenceTime) {
+		this.referenceTime = referenceTime;
 		if (!timeModeAbsolute) {
 			fireTableDataChanged();
 		}
 	}
 	
-	private String getTimeTextFrom(Date timemark) {
+	private String getTimeTextFrom(Instant time) {
 		if (timeModeAbsolute) {
-			Instant t = timemark.toInstant();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss", Locale.ENGLISH);
-			return t.atZone(ZoneId.of("UTC").normalized()).format(formatter);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS", Locale.ENGLISH);
+			return time.atZone(ZoneId.of("UTC").normalized()).format(formatter);
 		} else {
-			long t = Duration.between(referenceDate.toInstant(), timemark.toInstant()).toMillis() / 1000;
+			long t = Duration.between(referenceTime, time).toMillis() / 1000;
 			boolean negative = t < 0;
 			t = Math.abs(t);
 			int ts = (int)(t % 60);
@@ -205,5 +201,5 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	private BitSet noSdiWords;
 	private boolean timeModeAbsolute;
 	private boolean periodModeMin;
-	private Date referenceDate;
+	private Instant referenceTime;
 }

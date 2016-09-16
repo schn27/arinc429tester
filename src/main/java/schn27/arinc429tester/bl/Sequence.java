@@ -5,9 +5,9 @@
  */
 package schn27.arinc429tester.bl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -22,10 +22,10 @@ public class Sequence {
 	}
 	
 	public void put(Arinc429Word word) {
-		put(new Date(System.currentTimeMillis()), word);
+		put(Instant.now(), word);
 	}
 	
-	public void put(Date timemark, Arinc429Word word) {
+	public void put(Instant timemark, Arinc429Word word) {
 		data.add(new TimeMarkedArinc429Word(timemark, word));
 		for (SequenceChangedListener l : listeners) {
 			l.onSequenceAdded(data.size());

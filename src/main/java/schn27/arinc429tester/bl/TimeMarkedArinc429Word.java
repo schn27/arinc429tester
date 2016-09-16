@@ -5,18 +5,18 @@
  */
 package schn27.arinc429tester.bl;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  *
  * @author amalikov
  */
 public class TimeMarkedArinc429Word {
-	public TimeMarkedArinc429Word(Date timemark, Arinc429Word word) {
+	public TimeMarkedArinc429Word(Instant timemark, Arinc429Word word) {
 		this.timemark = timemark;
 		this.word = word;
 	}
 	
-	public final Date timemark;
+	public final Instant timemark;
 	public final Arinc429Word word;
 }

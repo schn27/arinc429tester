@@ -5,7 +5,7 @@
  */
 package schn27.arinc429tester.bl;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ public class FilteredSequence extends Sequence {
 	}
 
 	@Override
-	public void put(Date timemark, Arinc429Word word) {
+	public void put(Instant timemark, Arinc429Word word) {
 		original.put(timemark, word);
 		if (filter.isAccepted(word.getLabel() & 0xFF)) {
 			super.put(timemark, word);
