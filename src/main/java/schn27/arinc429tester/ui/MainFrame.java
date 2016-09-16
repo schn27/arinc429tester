@@ -3,6 +3,7 @@ package schn27.arinc429tester.ui;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.Instant;
 import java.util.BitSet;
 import schn27.arinc429tester.bl.Reader;
 import schn27.serial.Com;
@@ -84,13 +85,7 @@ public class MainFrame extends javax.swing.JFrame {
 			public void mouseClicked(MouseEvent e) {
 				if (table.columnAtPoint(e.getPoint()) == Arinc429TableModel.SDI) {
 					int row = table.rowAtPoint(e.getPoint());
-					byte label = filteredSequence.get(row).word.getLabel();
-					if (noSdiWords.get(label & 0xFF)) {
-						noSdiWords.set(label & 0xFF, false);
-					} else {
-						noSdiWords.set(label & 0xFF, true);
-					}
-				
+					noSdiWords.flip(filteredSequence.get(row).word.getLabel() & 0xFF);
 					final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
 					m.setNoSdiWords(noSdiWords);
 				}
@@ -210,7 +205,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnOpenActionPerformed
 
     private void btnResetTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTimeActionPerformed
-        
+        ((Arinc429TableModel)table.getModel()).setStartTime(Instant.now());
     }//GEN-LAST:event_btnResetTimeActionPerformed
 
     private void btnResetPeriodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetPeriodActionPerformed

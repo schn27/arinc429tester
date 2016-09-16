@@ -160,14 +160,16 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS", Locale.ENGLISH);
 			return time.atZone(ZoneId.of("UTC").normalized()).format(formatter);
 		} else {
-			long t = Duration.between(referenceTime, time).toMillis() / 1000;
+			long t = Duration.between(referenceTime, time).toMillis();
 			boolean negative = t < 0;
 			t = Math.abs(t);
-			int ts = (int)(t % 60);
-			int tm = (int)((t / 60) % 60);
-			int th = (int)(t / 3600);
 			
-			return String.format("%s%02d:%02d:%02d", negative ? "-" : "", th, tm, ts);
+			return String.format("%s%02d:%02d:%02d.%03d", 
+					negative ? "-" : "", 
+					(int)(t / (60 * 60 * 1000)), 
+					(int)((t / (60 * 1000)) % 60), 
+					(int)((t / 1000) % 60),
+					(int)(t % 1000));
 		}
 	}
 	
