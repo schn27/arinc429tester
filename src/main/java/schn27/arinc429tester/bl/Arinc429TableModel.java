@@ -54,7 +54,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		case TIME:
 			return String.format("Time (%s)", timeModeAbsolute ? "Abs" : "Start");
 		case PERIOD:
-			return String.format("Period (%s)", periodModeMin ? "Min" : "Max");
+			return String.format("Period, ms (%s)", periodModeRange ? "Range" : "Current");
 		case LABEL:
 			return String.format("Label (%s)", labelNumberSystem);
 		case SDI:
@@ -82,7 +82,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		case TIME:
 			return getTimeTextFrom(value.timemark);
 		case PERIOD:
-			return "n/a";
+			return getPeriodTextFrom(value.period, value.minPeriod, value.maxPeriod);
 		case LABEL:
 			return getLabelTextFrom(value.word);
 		case SDI:
@@ -144,7 +144,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	}
 	
 	public void togglePeriodMode() {
-		periodModeMin = !periodModeMin;
+		periodModeRange = !periodModeRange;
 		fireTableStructureChanged();
 	}
 	
@@ -170,6 +170,18 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 					(int)((t / (60 * 1000)) % 60), 
 					(int)((t / 1000) % 60),
 					(int)(t % 1000));
+		}
+	}
+	
+	private String getPeriodTextFrom(int period, int minPeriod, int maxPeriod) {
+		if ((periodModeRange && (minPeriod < 0 || maxPeriod < 0)) || (!periodModeRange && period < 0)) {
+			return "n/a";
+		}
+		
+		if (periodModeRange) {
+			return String.format("%d .. %d", minPeriod, maxPeriod);
+		} else {
+			return String.format("%d", period);
 		}
 	}
 	
@@ -202,6 +214,6 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	private NumberSystem labelNumberSystem;
 	private BitSet noSdiWords;
 	private boolean timeModeAbsolute;
-	private boolean periodModeMin;
+	private boolean periodModeRange;
 	private Instant referenceTime;
 }

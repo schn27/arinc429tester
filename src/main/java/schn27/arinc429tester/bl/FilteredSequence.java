@@ -20,11 +20,13 @@ public class FilteredSequence extends Sequence {
 	}
 
 	@Override
-	public void put(Instant timemark, Arinc429Word word) {
-		original.put(timemark, word);
+	public TimeMarkedArinc429Word put(Instant timemark, Arinc429Word word) {
+		TimeMarkedArinc429Word value = original.put(timemark, word);
 		if (filter.isAccepted(word.getLabel() & 0xFF)) {
-			super.put(timemark, word);
+			super.put(value);
 		}
+		
+		return value;
 	}
 	
 	@Override

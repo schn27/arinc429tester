@@ -12,13 +12,15 @@ import javax.swing.DefaultComboBoxModel;
 import schn27.arinc429tester.bl.Arinc429TableModel;
 import schn27.arinc429tester.bl.FilteredSequence;
 import schn27.arinc429tester.bl.LabelFilter;
+import schn27.arinc429tester.bl.PeriodDetector;
 import schn27.arinc429tester.bl.Sequence;
 
 public class MainFrame extends javax.swing.JFrame {
 
 	public MainFrame() {
 		filter = new LabelFilter();
-		sequence = new Sequence();
+		periodDetector = new PeriodDetector();
+		sequence = new Sequence(periodDetector);
 		filteredSequence = new FilteredSequence(sequence);
 		filteredSequence.setFilter(filter);
 		noSdiWords = new BitSet(256);
@@ -209,7 +211,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnResetTimeActionPerformed
 
     private void btnResetPeriodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetPeriodActionPerformed
-        
+        periodDetector.clear();
     }//GEN-LAST:event_btnResetPeriodActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -220,9 +222,10 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 
+	private final PeriodDetector periodDetector;
 	private final Sequence sequence;
 	private final FilteredSequence filteredSequence;
 	private Reader reader;
 	private LabelFilter filter;
-	private BitSet noSdiWords;
+	private final BitSet noSdiWords;
 }
