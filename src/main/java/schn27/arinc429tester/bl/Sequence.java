@@ -5,9 +5,9 @@
  */
 package schn27.arinc429tester.bl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,19 +17,41 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Sequence {
 	public Sequence() {
+		this(null);
+	}
+	
+	public Sequence(PeriodDetector periodDetector) {
 		data = Collections.synchronizedList(new ArrayList<>());
 		listeners = new CopyOnWriteArrayList<>();
+		this.periodDetector = periodDetector;
 	}
 	
-	public void put(Arinc429Word word) {
-		put(new Date(System.currentTimeMillis()), word);
+	public TimeMarkedArinc429Word put(Arinc429Word word) {
+		return put(Instant.now(), word);
 	}
 	
-	public void put(Date timemark, Arinc429Word word) {
-		data.add(new TimeMarkedArinc429Word(timemark, word));
+	public TimeMarkedArinc429Word put(Instant timemark, Arinc429Word word) {
+		int period = -1;
+		int minPeriod = -1;
+		int maxPeriod = -1;
+		
+		if (periodDetector != null) {
+			periodDetector.put(word.getLabel() & 0xFF, timemark);
+			period = periodDetector.get(word.getLabel() & 0xFF);
+			minPeriod = periodDetector.getMin(word.getLabel() & 0xFF);
+			maxPeriod = periodDetector.getMax(word.getLabel() & 0xFF);
+		}
+		
+		return put(new TimeMarkedArinc429Word(timemark, word, period, minPeriod, maxPeriod));
+	}
+	
+	public TimeMarkedArinc429Word put(TimeMarkedArinc429Word value) {
+		data.add(value);
 		for (SequenceChangedListener l : listeners) {
 			l.onSequenceAdded(data.size());
 		}
+		
+		return value;
 	}
 	
 	public void clear() {
@@ -63,4 +85,5 @@ public class Sequence {
 	
 	private final List<TimeMarkedArinc429Word> data;
 	private final List<SequenceChangedListener> listeners;
+	private final PeriodDetector periodDetector;
 }

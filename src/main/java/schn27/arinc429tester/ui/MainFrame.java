@@ -6,6 +6,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.Instant;
 import java.util.BitSet;
 import schn27.arinc429tester.bl.Reader;
 import schn27.serial.Com;
@@ -15,13 +16,15 @@ import schn27.arinc429tester.bl.Arinc429TableModel;
 import schn27.arinc429tester.bl.Arinc429Word;
 import schn27.arinc429tester.bl.FilteredSequence;
 import schn27.arinc429tester.bl.LabelFilter;
+import schn27.arinc429tester.bl.PeriodDetector;
 import schn27.arinc429tester.bl.Sequence;
 
 public class MainFrame extends javax.swing.JFrame {
 
 	public MainFrame() {
 		filter = new LabelFilter();
-		sequence = new Sequence();
+		periodDetector = new PeriodDetector();
+		sequence = new Sequence(periodDetector);
 		filteredSequence = new FilteredSequence(sequence);
 		filteredSequence.setFilter(filter);
 		noSdiWords = new BitSet(256);
@@ -82,10 +85,11 @@ public class MainFrame extends javax.swing.JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
-				int col = table.columnAtPoint(e.getPoint());
-				if (col == Arinc429TableModel.PARITY) {
+				switch (table.columnAtPoint(e.getPoint())) {
+				case Arinc429TableModel.PARITY:
 					m.toggleParityMode();
-				} else if (col == Arinc429TableModel.LABEL) {
+					break;
+				case Arinc429TableModel.LABEL:
 					LabelFilterDialog dlg = new LabelFilterDialog(MainFrame.this, true, filter);
 					Rectangle rect = dlg.getBounds();
 					rect.x = e.getXOnScreen();
@@ -96,6 +100,13 @@ public class MainFrame extends javax.swing.JFrame {
 					m.setLabelNumberSystem(filter.numberSystem);
 					updateStatusBar();
 					filteredSequence.setFilter(filter);
+					break;
+				case Arinc429TableModel.TIME:
+					m.toggleTimeMode();
+					break;
+				case Arinc429TableModel.PERIOD:
+					m.togglePeriodMode();
+					break;					
 				}
 			}
 		});		
@@ -107,13 +118,7 @@ public class MainFrame extends javax.swing.JFrame {
 			public void mouseClicked(MouseEvent e) {
 				if (table.columnAtPoint(e.getPoint()) == Arinc429TableModel.SDI) {
 					int row = table.rowAtPoint(e.getPoint());
-					byte label = filteredSequence.get(row).word.getLabel();
-					if (noSdiWords.get(label & 0xFF)) {
-						noSdiWords.set(label & 0xFF, false);
-					} else {
-						noSdiWords.set(label & 0xFF, true);
-					}
-				
+					noSdiWords.flip(filteredSequence.get(row).word.getLabel() & 0xFF);
 					final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
 					m.setNoSdiWords(noSdiWords);
 				}
@@ -134,6 +139,8 @@ public class MainFrame extends javax.swing.JFrame {
         table = new javax.swing.JTable();
         portName = new javax.swing.JComboBox();
         statusBar = new javax.swing.JLabel();
+        javax.swing.JButton btnResetTime = new javax.swing.JButton();
+        javax.swing.JButton btnResetPeriod = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Arinc429Tester");
@@ -168,6 +175,21 @@ public class MainFrame extends javax.swing.JFrame {
         statusBar.setText("345");
         statusBar.setToolTipText("");
 
+        btnResetTime.setText("Reset Time");
+        btnResetTime.setToolTipText("");
+        btnResetTime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetTimeActionPerformed(evt);
+            }
+        });
+
+        btnResetPeriod.setText("Reset Period");
+        btnResetPeriod.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetPeriodActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -176,8 +198,12 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(419, Short.MAX_VALUE))
-            .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(18, 18, 18)
+                .addComponent(btnResetTime)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnResetPeriod)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
             .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -185,7 +211,9 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnOpen)
-                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnResetTime)
+                    .addComponent(btnResetPeriod))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableScrollPane)
                 .addGap(0, 0, 0)
@@ -211,6 +239,14 @@ public class MainFrame extends javax.swing.JFrame {
 		btnOpen.setText(reader == null ? "Open" : "Close");
     }//GEN-LAST:event_btnOpenActionPerformed
 
+    private void btnResetTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTimeActionPerformed
+        ((Arinc429TableModel)table.getModel()).setStartTime(Instant.now());
+    }//GEN-LAST:event_btnResetTimeActionPerformed
+
+    private void btnResetPeriodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetPeriodActionPerformed
+        periodDetector.clear();
+    }//GEN-LAST:event_btnResetPeriodActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOpen;
     private javax.swing.JComboBox portName;
@@ -219,6 +255,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane tableScrollPane;
     // End of variables declaration//GEN-END:variables
 
+	private final PeriodDetector periodDetector;
 	private final Sequence sequence;
 	private final FilteredSequence filteredSequence;
 	private Reader reader;

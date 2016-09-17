@@ -5,7 +5,12 @@
  */
 package schn27.arinc429tester.bl;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.BitSet;
+import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -13,17 +18,20 @@ import javax.swing.table.AbstractTableModel;
  * @author amalikov
  */
 public class Arinc429TableModel extends AbstractTableModel implements SequenceChangedListener {
-	public static final int LABEL = 0;
-	public static final int SDI = 1;
-	public static final int DATA = 2;
-	public static final int SSM = 3;
-	public static final int PARITY = 4;
-	public static final int COLUMN_COUNT = 5;
+	public static final int TIME = 0;
+	public static final int PERIOD = 1;
+	public static final int LABEL = 2;
+	public static final int SDI = 3;
+	public static final int DATA = 4;
+	public static final int SSM = 5;
+	public static final int PARITY = 6;
+	public static final int COLUMN_COUNT = 7;
 	
 	public Arinc429TableModel() {
 		this.sequence = null;
 		parityModeOdd = true;
 		labelNumberSystem = NumberSystem.OCT;
+		referenceTime = Instant.now();
 	}
 	
 	@Override
@@ -43,6 +51,10 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	@Override
 	public String getColumnName(int col) {
 		switch (col) {
+		case TIME:
+			return String.format("Time (%s)", timeModeAbsolute ? "Abs" : "Start");
+		case PERIOD:
+			return String.format("Period, ms (%s)", periodModeRange ? "Range" : "Current");
 		case LABEL:
 			return String.format("Label (%s)", labelNumberSystem);
 		case SDI:
@@ -67,6 +79,10 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		TimeMarkedArinc429Word value = sequence.get(row);
 		
 		switch (col) {
+		case TIME:
+			return getTimeTextFrom(value.timemark);
+		case PERIOD:
+			return getPeriodTextFrom(value.period, value.minPeriod, value.maxPeriod);
 		case LABEL:
 			return getLabelTextFrom(value.word);
 		case SDI:
@@ -122,6 +138,53 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		fireTableDataChanged();
 	}
 	
+	public void toggleTimeMode() {
+		timeModeAbsolute = !timeModeAbsolute;
+		fireTableStructureChanged();
+	}
+	
+	public void togglePeriodMode() {
+		periodModeRange = !periodModeRange;
+		fireTableStructureChanged();
+	}
+	
+	public void setStartTime(Instant referenceTime) {
+		this.referenceTime = referenceTime;
+		if (!timeModeAbsolute) {
+			fireTableDataChanged();
+		}
+	}
+	
+	private String getTimeTextFrom(Instant time) {
+		if (timeModeAbsolute) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS", Locale.ENGLISH);
+			return time.atZone(ZoneId.of("UTC").normalized()).format(formatter);
+		} else {
+			long t = Duration.between(referenceTime, time).toMillis();
+			boolean negative = t < 0;
+			t = Math.abs(t);
+			
+			return String.format("%s%02d:%02d:%02d.%03d", 
+					negative ? "-" : "", 
+					(int)(t / (60 * 60 * 1000)), 
+					(int)((t / (60 * 1000)) % 60), 
+					(int)((t / 1000) % 60),
+					(int)(t % 1000));
+		}
+	}
+	
+	private String getPeriodTextFrom(int period, int minPeriod, int maxPeriod) {
+		if ((periodModeRange && (minPeriod < 0 || maxPeriod < 0)) || (!periodModeRange && period < 0)) {
+			return "n/a";
+		}
+		
+		if (periodModeRange) {
+			return String.format("%d .. %d", minPeriod, maxPeriod);
+		} else {
+			return String.format("%d", period);
+		}
+	}
+	
 	private String getLabelTextFrom(Arinc429Word word) {
 		return labelNumberSystem.integerToString(word.getLabel() & 0xFF, 8);
 	}
@@ -150,4 +213,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	private boolean parityModeOdd;
 	private NumberSystem labelNumberSystem;
 	private BitSet noSdiWords;
+	private boolean timeModeAbsolute;
+	private boolean periodModeRange;
+	private Instant referenceTime;
 }
