@@ -5,6 +5,7 @@ import schn27.serial.Serial;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import schn27.serial.FakePort;
+import schn27.utils.BitReverser;
 
 /*
  * Reads Arinc429 words from the Arinc429tester device via USB.
@@ -72,11 +73,10 @@ public class Reader implements Runnable {
 	}
 	
 	private int readWord() throws TimeoutException, InterruptedException {
-		receiveFrame();
-		return reverseBytes(getFramePayload());
+		return BitReverser.reverse(receiveFrame());
 	}
 
-	private void receiveFrame() throws InterruptedException, TimeoutException {
+	private int receiveFrame() throws InterruptedException, TimeoutException {
 		int pos = 0;
 		while (pos < frame.length) {
 			if  (comPort.read(frame, pos, 1, 1000) != 1) {
@@ -89,6 +89,8 @@ public class Reader implements Runnable {
 				pos = 0;
 			}
 		}
+		
+		return getFramePayload();
 	}
 
 	private int getFramePayload() {
@@ -101,18 +103,6 @@ public class Reader implements Runnable {
 		return (int)(res >> 3);
 	}	
 	
-	private int reverseBytes(int value) {
-		int res = 0;
-		
-		for (int i = 0; i < 4; ++i) {
-			res <<= 8;
-			res |= (value & 0xFF);
-			value >>= 8;
-		}
-		
-		return res;
-	}
-
 	private final Arinc429WordConsumer consumer;
 	private volatile boolean isRunning;
 	private final Serial comPort;

@@ -2,6 +2,7 @@ package schn27.serial;
 
 import schn27.arinc429tester.bl.Arinc429Word;
 import java.io.IOException;
+import schn27.utils.BitReverser;
 
 
 /**
@@ -51,7 +52,7 @@ public class FakePort implements Serial {
 				(int)(Math.random() * (1 << 19)),
 				(byte)(Math.random() * (1 << 2)));
 		
-		int w = word.raw;
+		int w = BitReverser.reverse(word.raw);
 		for (int i = 0; i < buffer.length; ++i) {
 			buffer[i] = (byte)(((i == 0) ? (byte)0x80 : 0) | (byte)((w >> 25) & 0x7f));
 			w <<= 7;

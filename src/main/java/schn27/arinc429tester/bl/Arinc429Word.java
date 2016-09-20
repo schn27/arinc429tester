@@ -6,7 +6,7 @@ public class Arinc429Word {
 	}
 	
 	public Arinc429Word(byte label, byte sdi, int data, byte ssm) {
-		int v = ((reverseBits(label) & 0xFF) | 
+		int v = ((label & 0xFF) | 
 				((sdi & 3) << 8) | 
 				((data & ((1 << 19) - 1)) << 10) | 
 				((ssm & 3) << 29)) & 0x7FFFFFFF;
@@ -39,7 +39,7 @@ public class Arinc429Word {
 	}
 	
 	public byte getLabel() {
-		return reverseBits((byte)(raw & 0xFF));
+		return (byte)(raw & 0xFF);
 	}
 	
 	private boolean getWordParity(int value) {
@@ -50,11 +50,5 @@ public class Arinc429Word {
 		return ((x ^ (x >> 1)) & 1) == 1;
 	}
 
-	private byte reverseBits(byte x) {
-		x = (byte)(((x >> 1) & 0x55) | ((x & 0x55) << 1));
-		x = (byte)(((x >> 2) & 0x33) | ((x & 0x33) << 2));
-		return (byte)(((x >> 4) & 0x0F) | (x << 4));
-	}	
-	
 	public final int raw;
 }
