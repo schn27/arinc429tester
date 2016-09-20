@@ -18,6 +18,7 @@ import schn27.arinc429tester.LabelFilter;
 import schn27.arinc429tester.PeriodDetector;
 import schn27.arinc429tester.Sequence;
 import schn27.arinc429tester.SerialFactory;
+import schn27.arinc429tester.TimeMarkedArinc429Word;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -231,11 +232,12 @@ public class MainFrame extends javax.swing.JFrame {
 			filteredSequence.clear();
 			reader = new Reader(
 					SerialFactory.create((String)portName.getSelectedItem()), 
-					(Arinc429Word word) -> {java.awt.EventQueue.invokeLater(() -> {filteredSequence.put(word);});},
+					(TimeMarkedArinc429Word word) -> {java.awt.EventQueue.invokeLater(() -> {filteredSequence.put(word);});},
 					() -> {java.awt.EventQueue.invokeLater(() -> {
 						reader = null;
 						updateOpenedState();
-					});}
+					});},
+					!SerialFactory.isTimedSerial((String)portName.getSelectedItem())
 			);
 			(new Thread(reader)).start();
 		} else {

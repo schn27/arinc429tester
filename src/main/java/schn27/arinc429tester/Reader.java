@@ -2,7 +2,9 @@ package schn27.arinc429tester;
 
 import schn27.serial.Serial;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import schn27.serial.NotAvailableException;
 import schn27.utils.BitReverser;
 
@@ -20,13 +22,14 @@ import schn27.utils.BitReverser;
  */
 
 public class Reader implements Runnable {
-	public Reader(Serial serial, Arinc429WordConsumer consumer, ReaderClosedListener readerClosedListener) {
+	public Reader(Serial serial, Consumer<TimeMarkedArinc429Word> consumer, ReaderClosedListener readerClosedListener, boolean fakeTime) {
 		this.consumer = consumer;
 		isRunning = true;
 		this.serial = serial;
 		opened = false;
 		frame = new byte[5];
 		this.readerClosedListener = readerClosedListener;
+		this.fakeTime = fakeTime;
 	}
 	
 	@FunctionalInterface
@@ -39,7 +42,7 @@ public class Reader implements Runnable {
 		while (isRunning) {
 			try {
 				open();
-				consumer.consume(new Arinc429Word(readWord()));
+				consumer.accept(readWord());
 			} catch (TimeoutException | InterruptedException ex) {
 			} catch (NotAvailableException ex) {
 				break;
@@ -79,8 +82,9 @@ public class Reader implements Runnable {
 		}
 	}
 	
-	private int readWord() throws TimeoutException, InterruptedException, NotAvailableException {
-		return BitReverser.reverse(receiveFrame());
+	private TimeMarkedArinc429Word readWord() throws TimeoutException, InterruptedException, NotAvailableException {
+		Arinc429Word word = new Arinc429Word(BitReverser.reverse(receiveFrame()));
+		return new TimeMarkedArinc429Word(fakeTime ? Instant.MIN : Instant.now(), word);
 	}
 
 	private int receiveFrame() throws InterruptedException, TimeoutException, NotAvailableException {
@@ -110,10 +114,11 @@ public class Reader implements Runnable {
 		return (int)(res >> 3);
 	}	
 	
-	private final Arinc429WordConsumer consumer;
+	private final Consumer<TimeMarkedArinc429Word> consumer;
 	private volatile boolean isRunning;
 	private final Serial serial;
 	private boolean opened;
 	private final byte[] frame;
 	private final ReaderClosedListener readerClosedListener;
+	private final boolean fakeTime;
 }

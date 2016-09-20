@@ -39,6 +39,10 @@ public final class SerialFactory {
 		return list;
 	}
 	
+	public final static boolean isTimedSerial(String name) {
+		return !name.equals(filePortName);
+	}
+	
 	private static Serial createFilePort() {
 		JFileChooser fc = new JFileChooser();
 		fc.setAcceptAllFileFilterUsed(false);

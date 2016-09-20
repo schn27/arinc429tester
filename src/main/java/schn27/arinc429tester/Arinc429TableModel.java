@@ -156,7 +156,9 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	}
 	
 	private String getTimeTextFrom(Instant time) {
-		if (timeModeAbsolute) {
+		if (time.equals(Instant.MIN)) {
+			return "n/a";
+		} else if (timeModeAbsolute) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS", Locale.ENGLISH);
 			return time.atZone(ZoneId.of("UTC").normalized()).format(formatter);
 		} else {

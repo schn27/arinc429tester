@@ -27,7 +27,7 @@ public class Sequence {
 	}
 	
 	public TimeMarkedArinc429Word put(Arinc429Word word) {
-		return put(Instant.now(), word);
+		return put(Instant.MIN, word);
 	}
 	
 	public TimeMarkedArinc429Word put(Instant timemark, Arinc429Word word) {
