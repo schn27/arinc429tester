@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.time.Instant;
 import java.util.BitSet;
 import schn27.arinc429tester.Reader;
-import schn27.serial.Com;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import schn27.arinc429tester.Arinc429TableModel;
@@ -18,6 +17,7 @@ import schn27.arinc429tester.FilteredSequence;
 import schn27.arinc429tester.LabelFilter;
 import schn27.arinc429tester.PeriodDetector;
 import schn27.arinc429tester.Sequence;
+import schn27.arinc429tester.SerialFactory;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -36,13 +36,11 @@ public class MainFrame extends javax.swing.JFrame {
 	}
 
 	private void initPortList() {
-		List<String> ports = Com.getList();
+		List<String> ports = SerialFactory.getList();
 		DefaultComboBoxModel<String> m = (DefaultComboBoxModel<String>)portName.getModel();
 		for (String port : ports) {
 			m.addElement(port);
 		}
-		
-		m.addElement("Fake");
 	}
 
 	private void initTable() {
@@ -226,7 +224,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
 			filteredSequence.clear();
-			reader = new Reader((String)portName.getSelectedItem(), (Arinc429Word word) -> {
+			reader = new Reader(SerialFactory.create((String)portName.getSelectedItem()), (Arinc429Word word) -> {
 				java.awt.EventQueue.invokeLater(() -> {filteredSequence.put(word);});
 			});
 			(new Thread(reader)).start();

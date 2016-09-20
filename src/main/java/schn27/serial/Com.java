@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
@@ -23,7 +24,7 @@ public class Com implements Serial {
 	}
 	
 	public static List<String> getList() {
-		return Arrays.asList(SerialPortList.getPortNames());
+		return Arrays.stream(SerialPortList.getPortNames()).collect(Collectors.toList());
 	}
 	
 	@Override

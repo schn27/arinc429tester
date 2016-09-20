@@ -1,6 +1,5 @@
 package schn27.arinc429tester;
 
-import schn27.serial.Com;
 import schn27.serial.Serial;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -20,10 +19,10 @@ import schn27.utils.BitReverser;
  */
 
 public class Reader implements Runnable {
-	public Reader(String portName, Arinc429WordConsumer consumer) {
-		comPort = portName.equals("Fake") ? new FakePort() : new Com(portName, 230400);
+	public Reader(Serial serial, Arinc429WordConsumer consumer) {
 		this.consumer = consumer;
 		isRunning = true;
+		this.serial = serial;
 		opened = false;
 		frame = new byte[5];
 	}
@@ -52,7 +51,7 @@ public class Reader implements Runnable {
 			return;
 		}
 		
-		comPort.open();
+		serial.open();
 		opened = true;
 	}
 	
@@ -61,9 +60,9 @@ public class Reader implements Runnable {
 			return;
 		}
 		
-		if (comPort != null) {
+		if (serial != null) {
 			try {
-				comPort.close();
+				serial.close();
 			} catch (IOException ex) {
 			}
 		}
@@ -78,7 +77,7 @@ public class Reader implements Runnable {
 	private int receiveFrame() throws InterruptedException, TimeoutException {
 		int pos = 0;
 		while (pos < frame.length) {
-			if  (comPort.read(frame, pos, 1, 1000) != 1) {
+			if  (serial.read(frame, pos, 1, 1000) != 1) {
 				throw new TimeoutException();
 			}
 			
@@ -104,7 +103,7 @@ public class Reader implements Runnable {
 	
 	private final Arinc429WordConsumer consumer;
 	private volatile boolean isRunning;
-	private final Serial comPort;
+	private final Serial serial;
 	private boolean opened;
 	private final byte[] frame;
 }
