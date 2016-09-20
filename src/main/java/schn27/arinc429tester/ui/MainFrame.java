@@ -8,16 +8,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
 import java.util.BitSet;
-import schn27.arinc429tester.bl.Reader;
+import schn27.arinc429tester.Reader;
 import schn27.serial.Com;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
-import schn27.arinc429tester.bl.Arinc429TableModel;
-import schn27.arinc429tester.bl.Arinc429Word;
-import schn27.arinc429tester.bl.FilteredSequence;
-import schn27.arinc429tester.bl.LabelFilter;
-import schn27.arinc429tester.bl.PeriodDetector;
-import schn27.arinc429tester.bl.Sequence;
+import schn27.arinc429tester.Arinc429TableModel;
+import schn27.arinc429tester.Arinc429Word;
+import schn27.arinc429tester.FilteredSequence;
+import schn27.arinc429tester.LabelFilter;
+import schn27.arinc429tester.PeriodDetector;
+import schn27.arinc429tester.Sequence;
 
 public class MainFrame extends javax.swing.JFrame {
 

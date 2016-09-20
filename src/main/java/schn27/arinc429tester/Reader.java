@@ -1,4 +1,4 @@
-package schn27.arinc429tester.bl;
+package schn27.arinc429tester;
 
 import schn27.serial.Com;
 import schn27.serial.Serial;

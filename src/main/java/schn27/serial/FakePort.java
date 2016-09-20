@@ -1,6 +1,6 @@
 package schn27.serial;
 
-import schn27.arinc429tester.bl.Arinc429Word;
+import schn27.arinc429tester.Arinc429Word;
 import java.io.IOException;
 import schn27.utils.BitReverser;
 
