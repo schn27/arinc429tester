@@ -128,6 +128,11 @@ public class MainFrame extends javax.swing.JFrame {
 		statusBar.setText(filter.toString());
 	}
 	
+	private void updateOpenedState() {
+		portName.setEnabled(reader == null);
+		btnOpen.setText(reader == null ? "Open" : "Close");		
+	}
+	
 	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -224,17 +229,21 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
 			filteredSequence.clear();
-			reader = new Reader(SerialFactory.create((String)portName.getSelectedItem()), (Arinc429Word word) -> {
-				java.awt.EventQueue.invokeLater(() -> {filteredSequence.put(word);});
-			});
+			reader = new Reader(
+					SerialFactory.create((String)portName.getSelectedItem()), 
+					(Arinc429Word word) -> {java.awt.EventQueue.invokeLater(() -> {filteredSequence.put(word);});},
+					() -> {java.awt.EventQueue.invokeLater(() -> {
+						reader = null;
+						updateOpenedState();
+					});}
+			);
 			(new Thread(reader)).start();
 		} else {
 			reader.stop();
 			reader = null;
 		}
 		
-		portName.setEnabled(reader == null);
-		btnOpen.setText(reader == null ? "Open" : "Close");
+		updateOpenedState();
     }//GEN-LAST:event_btnOpenActionPerformed
 
     private void btnResetTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTimeActionPerformed

@@ -48,7 +48,7 @@ public class Com implements Serial {
 	}
 	
 	@Override
-	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException {
+	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
 		try {
 			rwLock.readLock().lock();
 			return readImpl(buffer, ofs, size, timeout);
@@ -119,7 +119,7 @@ public class Com implements Serial {
 		port = null;
 	}
 
-	private int readImpl(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException {
+	private int readImpl(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
 		try {
 			byte[] read = port.readBytes(size, timeout);
 
@@ -129,7 +129,7 @@ public class Com implements Serial {
 			
 			return size;
 		} catch (SerialPortException ex) {
-			log.log(Level.SEVERE, "exception", ex);
+			throw new NotAvailableException(ex.getMessage());
 		} catch (SerialPortTimeoutException ex) {
 		}
 
