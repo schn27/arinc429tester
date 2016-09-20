@@ -6,6 +6,8 @@
 package schn27.arinc429tester;
 
 import java.util.List;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.serial.Com;
 import schn27.serial.NullSerial;
 import schn27.serial.Serial;
@@ -38,6 +40,14 @@ public final class SerialFactory {
 	}
 	
 	private static Serial createFilePort() {
-		return new NullSerial();
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("Raw", "raw"));
+		
+		if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			return new ReadFilePort(fc.getSelectedFile().getPath());
+		} else {
+			return new NullSerial();
+		}
 	}
 }
