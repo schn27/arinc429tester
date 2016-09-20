@@ -4,7 +4,6 @@ import schn27.serial.Com;
 import schn27.serial.Serial;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-import schn27.serial.FakePort;
 import schn27.utils.BitReverser;
 
 /*
