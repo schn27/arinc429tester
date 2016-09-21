@@ -232,11 +232,11 @@ public class MainFrame extends javax.swing.JFrame {
 			filteredSequence.clear();
 			reader = new Reader(
 					SerialFactory.create((String)portName.getSelectedItem()), 
-					(TimeMarkedArinc429Word word) -> {java.awt.EventQueue.invokeLater(() -> {filteredSequence.put(word);});},
-					() -> {java.awt.EventQueue.invokeLater(() -> {
+					(TimeMarkedArinc429Word word) -> java.awt.EventQueue.invokeLater(() -> filteredSequence.put(word)),
+					() -> java.awt.EventQueue.invokeLater(() -> {
 						reader = null;
 						updateOpenedState();
-					});},
+					}),
 					!SerialFactory.isTimedSerial((String)portName.getSelectedItem())
 			);
 			(new Thread(reader)).start();

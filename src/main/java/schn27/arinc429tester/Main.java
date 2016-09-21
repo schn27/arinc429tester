@@ -13,7 +13,7 @@ public class Main {
 		setupLogger();
 		setLookAndFeel();
 		MainFrame mainFrame = new MainFrame();
-		java.awt.EventQueue.invokeLater(() -> {mainFrame.setVisible(true);});
+		java.awt.EventQueue.invokeLater(() -> mainFrame.setVisible(true));
 	}
 
 	private static void setLookAndFeel() {
