@@ -44,6 +44,7 @@ public class CalcDialog extends javax.swing.JDialog {
         javax.swing.JButton jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Data convertor");
         setResizable(false);
 
         jPanel1.setLayout(new java.awt.GridLayout(6, 2, 0, 10));
