@@ -103,7 +103,7 @@ public class MainFrame extends javax.swing.JFrame {
 					((Arinc429TableModel)table.getModel()).toggleNoSdi(table.rowAtPoint(e.getPoint()));
 					break;
 				case Arinc429TableModel.CALC:
-					CalcDialog dlg = new CalcDialog(MainFrame.this, true);
+					ConverterDialog dlg = new ConverterDialog(MainFrame.this, true);
 					Rectangle rect = dlg.getBounds();
 					rect.x = e.getXOnScreen();
 					rect.y = e.getYOnScreen();
