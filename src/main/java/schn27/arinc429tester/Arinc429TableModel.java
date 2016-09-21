@@ -132,7 +132,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	public void toggleNoSdi(int row) {
-		noSdiWords.flip(row);
+		noSdiWords.flip(filteredSequence.get(row).tmword.word.getLabel() & 0xFF);
 		fireTableDataChanged();
 	}
 	
