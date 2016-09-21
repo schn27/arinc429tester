@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
@@ -17,7 +18,7 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author amalikov
  */
-public class Arinc429TableModel extends AbstractTableModel implements SequenceChangedListener {
+public class Arinc429TableModel extends AbstractTableModel {
 	public static final int TIME = 0;
 	public static final int PERIOD = 1;
 	public static final int LABEL = 2;
@@ -28,19 +29,18 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	public static final int COLUMN_COUNT = 7;
 	
 	public Arinc429TableModel() {
-		this.sequence = null;
+		sequence = new Sequence();
+		filteredSequence = new Sequence();
+		labelFilter = new LabelFilter();
 		parityModeOdd = true;
-		labelNumberSystem = NumberSystem.OCT;
+		noSdiWords = new BitSet(256);
+		periodDetector = new PeriodDetector();
 		referenceTime = Instant.now();
 	}
 	
 	@Override
 	public int getRowCount() {
-		if (sequence == null) {
-			return 0;
-		}
-		
-		return sequence.size();
+		return filteredSequence.size();
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		case PERIOD:
 			return String.format("Period, ms (%s)", periodModeRange ? "Range" : "Current");
 		case LABEL:
-			return String.format("Label (%s)", labelNumberSystem);
+			return String.format("Label (%s)", labelFilter.numberSystem);
 		case SDI:
 			return "SDI 10 9";
 		case DATA:
@@ -72,60 +72,58 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	
 	@Override
 	public Object getValueAt(int row, int col) {
-		if (sequence == null) {
-			return null;
-		}
-		
-		TimeMarkedArinc429Word value = sequence.get(row);
+		SequenceItem item = filteredSequence.get(row);
 		
 		switch (col) {
 		case TIME:
-			return getTimeTextFrom(value.timemark);
+			return getTimeTextFrom(item.tmword.timemark);
 		case PERIOD:
-			return getPeriodTextFrom(value.period, value.minPeriod, value.maxPeriod);
+			return getPeriodTextFrom(item.period, item.minPeriod, item.maxPeriod);
 		case LABEL:
-			return getLabelTextFrom(value.word);
+			return getLabelTextFrom(item.tmword.word);
 		case SDI:
-			return getSdiTextFrom(value.word);
+			return getSdiTextFrom(item.tmword.word);
 		case DATA:
-			return getDataTextFrom(value.word);
+			return getDataTextFrom(item.tmword.word);
 		case SSM:
-			return getSsmTextFrom(value.word);
+			return getSsmTextFrom(item.tmword.word);
 		case PARITY:
-			return getParityTextFrom(value.word);		
+			return getParityTextFrom(item.tmword.word);		
 		}
 		
 		return null;
 	}
 	
-	public void setSequence(Sequence sequence) {
-		if (this.sequence != null) {
-			this.sequence.removeListener(this);
+	public void clear() {
+		sequence.clear();
+		filteredSequence.clear();
+		fireTableDataChanged();
+	}
+	
+	public void put(TimeMarkedArinc429Word tmword) {
+		int id = tmword.word.getLabel() & 0xFF;
+		periodDetector.put(id, tmword.timemark);
+		SequenceItem item = new SequenceItem(tmword, periodDetector.get(id), periodDetector.getMin(id), periodDetector.getMax(id));
+		sequence.put(item);
+		putToFilteredSequence(item);
+	}
+	
+	public LabelFilter getLabelFilter() {
+		return labelFilter;
+	}
+	
+	public void setLabelFilter(LabelFilter labelFilter) {
+		this.labelFilter = labelFilter;
+		filteredSequence.clear();
+		fireTableDataChanged();
+		List<SequenceItem> items = sequence.getList();
+		for (SequenceItem item : items) {
+			putToFilteredSequence(item);
 		}
-		
-		this.sequence = sequence;
-		fireTableDataChanged();
-		
-		this.sequence.addListener(this);
 	}
 	
-	public NumberSystem getLabelNumberSystem() {
-		return labelNumberSystem;
-	}
-	
-	public void setLabelNumberSystem(NumberSystem labelNumberSystem) {
-		this.labelNumberSystem = labelNumberSystem;
-		fireTableStructureChanged();
-	}
-	
-	@Override
-	public void onSequenceAdded(int size) {
-		fireTableRowsInserted(size - 1, size - 1);
-	}	
-
-	@Override
-	public void onSequenceCleared() {
-		fireTableDataChanged();
+	public void clearPeriodDetector() {
+		periodDetector.clear();
 	}
 	
 	public void toggleParityMode() {
@@ -133,8 +131,8 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		fireTableStructureChanged();
 	}
 	
-	public void setNoSdiWords(BitSet noSdiWords) {
-		this.noSdiWords = noSdiWords;
+	public void toggleNoSdi(int row) {
+		noSdiWords.flip(row);
 		fireTableDataChanged();
 	}
 	
@@ -152,6 +150,13 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		this.referenceTime = referenceTime;
 		if (!timeModeAbsolute) {
 			fireTableDataChanged();
+		}
+	}
+	
+	private void putToFilteredSequence(SequenceItem item) {
+		if (labelFilter.isAccepted(item.tmword.word.getLabel() & 0xFF)) {
+			filteredSequence.put(item);
+			fireTableRowsInserted(filteredSequence.size() - 1, filteredSequence.size() - 1);
 		}
 	}
 	
@@ -188,15 +193,15 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 	}
 	
 	private String getLabelTextFrom(Arinc429Word word) {
-		return labelNumberSystem.integerToString(word.getLabel() & 0xFF, 8);
+		return labelFilter.numberSystem.integerToString(word.getLabel() & 0xFF, 8);
 	}
 
 	private String getSdiTextFrom(Arinc429Word word) {
-		return (noSdiWords == null || !noSdiWords.get(word.getLabel() & 0xFF)) ? String.format("%d %d", word.getSdi() >> 1, word.getSdi() & 1) : "-";
+		return !noSdiWords.get(word.getLabel() & 0xFF) ? String.format("%d %d", word.getSdi() >> 1, word.getSdi() & 1) : "-";
 	}
 
 	private String getDataTextFrom(Arinc429Word word) {
-		if (noSdiWords == null || !noSdiWords.get(word.getLabel() & 0xFF)) {
+		if (!noSdiWords.get(word.getLabel() & 0xFF)) {
 			return String.format("%19s", Integer.toBinaryString(word.getData())).replace(' ', '0');
 		} else {
 			return String.format("%21s", Integer.toBinaryString((word.getData() << 2) + word.getSdi())).replace(' ', '0');
@@ -211,10 +216,12 @@ public class Arinc429TableModel extends AbstractTableModel implements SequenceCh
 		return String.format("%s %d", word.isParityCorrect(parityModeOdd) ? "OK" : "FAIL", word.getParity());
 	}
 	
-	private Sequence sequence;
+	private final Sequence sequence;
+	private final Sequence filteredSequence;
+	private LabelFilter labelFilter;
 	private boolean parityModeOdd;
-	private NumberSystem labelNumberSystem;
-	private BitSet noSdiWords;
+	private final BitSet noSdiWords;
+	private final PeriodDetector periodDetector;
 	private boolean timeModeAbsolute;
 	private boolean periodModeRange;
 	private Instant referenceTime;

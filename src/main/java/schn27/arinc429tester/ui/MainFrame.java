@@ -7,29 +7,16 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
-import java.util.BitSet;
 import schn27.arinc429tester.Reader;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import schn27.arinc429tester.Arinc429TableModel;
-import schn27.arinc429tester.Arinc429Word;
-import schn27.arinc429tester.FilteredSequence;
-import schn27.arinc429tester.LabelFilter;
-import schn27.arinc429tester.PeriodDetector;
-import schn27.arinc429tester.Sequence;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
 
 public class MainFrame extends javax.swing.JFrame {
 
 	public MainFrame() {
-		filter = new LabelFilter();
-		periodDetector = new PeriodDetector();
-		sequence = new Sequence(periodDetector);
-		filteredSequence = new FilteredSequence(sequence);
-		filteredSequence.setFilter(filter);
-		noSdiWords = new BitSet(256);
-		
 		initComponents();
 		initPortList();
 		initTable();
@@ -45,9 +32,7 @@ public class MainFrame extends javax.swing.JFrame {
 	}
 
 	private void initTable() {
-		Arinc429TableModel tableModel = new Arinc429TableModel();
-		tableModel.setSequence(filteredSequence);
-		table.setModel(tableModel);
+		table.setModel(new Arinc429TableModel());
 		setTableAutoScrollHandler();
 		setTableHeaderClickHandler();
 		setTableRowClickHandler();
@@ -89,16 +74,14 @@ public class MainFrame extends javax.swing.JFrame {
 					m.toggleParityMode();
 					break;
 				case Arinc429TableModel.LABEL:
-					LabelFilterDialog dlg = new LabelFilterDialog(MainFrame.this, true, filter);
+					LabelFilterDialog dlg = new LabelFilterDialog(MainFrame.this, true, m.getLabelFilter());
 					Rectangle rect = dlg.getBounds();
 					rect.x = e.getXOnScreen();
 					rect.y = e.getYOnScreen();
 					dlg.setBounds(rect);
 					dlg.setVisible(true);
-					filter = dlg.getLabelFilter();
-					m.setLabelNumberSystem(filter.numberSystem);
-					updateStatusBar();
-					filteredSequence.setFilter(filter);
+					m.setLabelFilter(dlg.getLabelFilter());
+					updateStatusBar();					
 					break;
 				case Arinc429TableModel.TIME:
 					m.toggleTimeMode();
@@ -116,17 +99,14 @@ public class MainFrame extends javax.swing.JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (table.columnAtPoint(e.getPoint()) == Arinc429TableModel.SDI) {
-					int row = table.rowAtPoint(e.getPoint());
-					noSdiWords.flip(filteredSequence.get(row).word.getLabel() & 0xFF);
-					final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
-					m.setNoSdiWords(noSdiWords);
+					((Arinc429TableModel)table.getModel()).toggleNoSdi(table.rowAtPoint(e.getPoint()));
 				}
 			}
 		});		
 	}	
 	
 	private void updateStatusBar() {
-		statusBar.setText(filter.toString());
+		statusBar.setText(((Arinc429TableModel)table.getModel()).getLabelFilter().toString());
 	}
 	
 	private void updateOpenedState() {
@@ -229,10 +209,11 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         if (reader == null) {
-			filteredSequence.clear();
+			((Arinc429TableModel)table.getModel()).clearPeriodDetector();
+			((Arinc429TableModel)table.getModel()).clear();
 			reader = new Reader(
 					SerialFactory.create((String)portName.getSelectedItem()), 
-					(TimeMarkedArinc429Word word) -> java.awt.EventQueue.invokeLater(() -> filteredSequence.put(word)),
+					(TimeMarkedArinc429Word word) -> java.awt.EventQueue.invokeLater(() -> ((Arinc429TableModel)table.getModel()).put(word)),
 					() -> java.awt.EventQueue.invokeLater(() -> {
 						reader = null;
 						updateOpenedState();
@@ -253,7 +234,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnResetTimeActionPerformed
 
     private void btnResetPeriodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetPeriodActionPerformed
-        periodDetector.clear();
+        ((Arinc429TableModel)table.getModel()).clearPeriodDetector();
     }//GEN-LAST:event_btnResetPeriodActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -264,10 +245,5 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane tableScrollPane;
     // End of variables declaration//GEN-END:variables
 
-	private final PeriodDetector periodDetector;
-	private final Sequence sequence;
-	private final FilteredSequence filteredSequence;
 	private Reader reader;
-	private LabelFilter filter;
-	private final BitSet noSdiWords;
 }

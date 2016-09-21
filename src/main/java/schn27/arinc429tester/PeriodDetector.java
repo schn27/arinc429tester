@@ -30,6 +30,10 @@ public class PeriodDetector {
 	}
 	
 	public void put(int id, Instant time) {
+		if (time.equals(Instant.MIN)) {
+			return;
+		}
+		
 		if (this.time.containsKey(id)) {
 			long delta = Duration.between(this.time.get(id), time).toMillis();
 			
