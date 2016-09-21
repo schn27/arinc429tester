@@ -98,8 +98,18 @@ public class MainFrame extends javax.swing.JFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (table.columnAtPoint(e.getPoint()) == Arinc429TableModel.SDI) {
+				switch (table.columnAtPoint(e.getPoint())) {
+				case Arinc429TableModel.SDI:
 					((Arinc429TableModel)table.getModel()).toggleNoSdi(table.rowAtPoint(e.getPoint()));
+					break;
+				case Arinc429TableModel.CALC:
+					CalcDialog dlg = new CalcDialog(MainFrame.this, true);
+					Rectangle rect = dlg.getBounds();
+					rect.x = e.getXOnScreen();
+					rect.y = e.getYOnScreen();
+					dlg.setBounds(rect);
+					dlg.setVisible(true);
+					break;
 				}
 			}
 		});		

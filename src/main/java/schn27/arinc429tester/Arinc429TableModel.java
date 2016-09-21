@@ -26,7 +26,8 @@ public class Arinc429TableModel extends AbstractTableModel {
 	public static final int DATA = 4;
 	public static final int SSM = 5;
 	public static final int PARITY = 6;
-	public static final int COLUMN_COUNT = 7;
+	public static final int CALC = 7;
+	public static final int COLUMN_COUNT = 8;
 	
 	public Arinc429TableModel() {
 		sequence = new Sequence();
@@ -65,6 +66,8 @@ public class Arinc429TableModel extends AbstractTableModel {
 			return "SSM 31 30";
 		case PARITY:
 			return String.format("Par (%s)", parityModeOdd ? "Odd*" : "Even");
+		case CALC:
+			return "Calc";
 		}
 
 		return null;
@@ -88,7 +91,9 @@ public class Arinc429TableModel extends AbstractTableModel {
 		case SSM:
 			return getSsmTextFrom(item.tmword.word);
 		case PARITY:
-			return getParityTextFrom(item.tmword.word);		
+			return getParityTextFrom(item.tmword.word);
+		case CALC:
+			return getCalcDataTextFrom(item.tmword.word);
 		}
 		
 		return null;
@@ -214,6 +219,10 @@ public class Arinc429TableModel extends AbstractTableModel {
 
 	private String getParityTextFrom(Arinc429Word word) {
 		return String.format("%s %d", word.isParityCorrect(parityModeOdd) ? "OK" : "FAIL", word.getParity());
+	}
+	
+	private String getCalcDataTextFrom(Arinc429Word word) {
+		return "";
 	}
 	
 	private final Sequence sequence;
