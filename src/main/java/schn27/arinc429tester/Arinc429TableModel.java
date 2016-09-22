@@ -10,8 +10,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -37,6 +39,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		noSdiWords = new BitSet(256);
 		periodDetector = new PeriodDetector();
 		referenceTime = Instant.now();
+		convertors = new HashMap<>();
 	}
 	
 	@Override
@@ -106,9 +109,9 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	public void put(TimeMarkedArinc429Word tmword) {
-		int id = tmword.word.getLabel() & 0xFF;
-		periodDetector.put(id, tmword.timemark);
-		SequenceItem item = new SequenceItem(tmword, periodDetector.get(id), periodDetector.getMin(id), periodDetector.getMax(id));
+		int label = tmword.word.getLabel();
+		periodDetector.put(label, tmword.timemark);
+		SequenceItem item = new SequenceItem(tmword, periodDetector.get(label), periodDetector.getMin(label), periodDetector.getMax(label));
 		sequence.put(item);
 		putToFilteredSequence(item);
 	}
@@ -159,7 +162,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	private void putToFilteredSequence(SequenceItem item) {
-		if (labelFilter.isAccepted(item.tmword.word.getLabel() & 0xFF)) {
+		if (labelFilter.isAccepted(item.tmword.word.getLabel())) {
 			filteredSequence.put(item);
 			fireTableRowsInserted(filteredSequence.size() - 1, filteredSequence.size() - 1);
 		}
@@ -198,15 +201,15 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	private String getLabelTextFrom(Arinc429Word word) {
-		return labelFilter.numberSystem.integerToString(word.getLabel() & 0xFF, 8);
+		return labelFilter.numberSystem.integerToString(word.getLabel(), 8);
 	}
 
 	private String getSdiTextFrom(Arinc429Word word) {
-		return !noSdiWords.get(word.getLabel() & 0xFF) ? String.format("%d %d", word.getSdi() >> 1, word.getSdi() & 1) : "-";
+		return !noSdiWords.get(word.getLabel()) ? String.format("%d %d", word.getSdi() >> 1, word.getSdi() & 1) : "-";
 	}
 
 	private String getDataTextFrom(Arinc429Word word) {
-		if (!noSdiWords.get(word.getLabel() & 0xFF)) {
+		if (!noSdiWords.get(word.getLabel())) {
 			return String.format("%19s", Integer.toBinaryString(word.getData())).replace(' ', '0');
 		} else {
 			return String.format("%21s", Integer.toBinaryString((word.getData() << 2) + word.getSdi())).replace(' ', '0');
@@ -222,7 +225,8 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	private String getCalcDataTextFrom(Arinc429Word word) {
-		return "";
+		Convertor conv = convertors.getOrDefault(word.getLabel(), null);
+		return conv != null ? String.format("%f", conv.getConverted(word)) : "";
 	}
 	
 	private final Sequence sequence;
@@ -234,4 +238,5 @@ public class Arinc429TableModel extends AbstractTableModel {
 	private boolean timeModeAbsolute;
 	private boolean periodModeRange;
 	private Instant referenceTime;
+	private final Map<Integer, Convertor> convertors;
 }
