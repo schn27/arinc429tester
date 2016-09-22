@@ -10,6 +10,10 @@ package schn27.arinc429tester;
  * @author amalikov
  */
 public class Convertor {
+	public Convertor(int label) {
+		this(label, Type.NULL, -1, -1, -1, Double.NaN);
+	}
+	
 	public Convertor(int label, Type type, int signBit, int hiBit, int loBit, double hiBitValue) {
 		this.label = label;
 		this.type = type;
@@ -20,6 +24,10 @@ public class Convertor {
 	}
 	
 	public double getConverted(Arinc429Word word) {
+		if (type == Type.NULL) {
+			return Double.NaN;
+		}
+		
 		final int mantissaBits = hiBit - loBit + 1;
 		final int mantissaMask = (1 << mantissaBits) - 1;
 		int data = (word.raw >> (loBit - 1)) & mantissaMask;
@@ -36,7 +44,7 @@ public class Convertor {
 	}
 
 	public final int label;
-	public enum Type {COMPLEMENT, DIRECT, BCD}
+	public enum Type {NULL, COMPLEMENT, DIRECT, BCD}
 	public final Type type;
 	public final int signBit;
 	public final int hiBit;

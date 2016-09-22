@@ -140,7 +140,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	public void toggleNoSdi(int row) {
-		noSdiWords.flip(row);
+		noSdiWords.flip(filteredSequence.get(row).tmword.word.getLabel());
 		fireTableDataChanged();
 	}
 	
@@ -161,6 +161,22 @@ public class Arinc429TableModel extends AbstractTableModel {
 		}
 	}
 	
+	public Convertor getConvertor(int row) {
+		int label = filteredSequence.get(row).tmword.word.getLabel();
+		Convertor conv = convertors.getOrDefault(label, null);
+		return conv != null ? conv : new Convertor(label);
+	}
+	
+	public void setConvertor(Convertor convertor) {
+		if (convertor.type != Convertor.Type.NULL) {
+			convertors.put(convertor.label, convertor);
+		} else {
+			convertors.remove(convertor.label);
+		}
+		
+		fireTableDataChanged();
+	}
+
 	private void putToFilteredSequence(SequenceItem item) {
 		if (labelFilter.isAccepted(item.tmword.word.getLabel())) {
 			filteredSequence.put(item);
