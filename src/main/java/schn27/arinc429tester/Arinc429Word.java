@@ -5,8 +5,8 @@ public class Arinc429Word {
 		this.raw = raw;
 	}
 	
-	public Arinc429Word(byte label, byte sdi, int data, byte ssm) {
-		int v = ((label & 0xFF) | 
+	public Arinc429Word(int label, byte sdi, int data, byte ssm) {
+		int v = (label | 
 				((sdi & 3) << 8) | 
 				((data & ((1 << 19) - 1)) << 10) | 
 				((ssm & 3) << 29)) & 0x7FFFFFFF;
@@ -38,8 +38,8 @@ public class Arinc429Word {
 		return (byte)((raw >> 8) & 3);
 	}
 	
-	public byte getLabel() {
-		return (byte)(raw & 0xFF);
+	public int getLabel() {
+		return raw & 0xFF;
 	}
 	
 	private boolean getWordParity(int value) {

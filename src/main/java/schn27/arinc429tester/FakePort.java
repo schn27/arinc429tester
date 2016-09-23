@@ -47,7 +47,7 @@ public class FakePort implements Serial {
 		}		
 		
 		Arinc429Word word = new Arinc429Word(
-				(byte)(Math.random() * (1 << 8)),
+				(int)(Math.random() * (1 << 8)),
 				(byte)(Math.random() * (1 << 2)),
 				(int)(Math.random() * (1 << 19)),
 				(byte)(Math.random() * (1 << 2)));

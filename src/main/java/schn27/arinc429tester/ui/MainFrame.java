@@ -11,6 +11,7 @@ import schn27.arinc429tester.Reader;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import schn27.arinc429tester.Arinc429TableModel;
+import schn27.arinc429tester.Convertor;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
 
@@ -98,8 +99,21 @@ public class MainFrame extends javax.swing.JFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (table.columnAtPoint(e.getPoint()) == Arinc429TableModel.SDI) {
-					((Arinc429TableModel)table.getModel()).toggleNoSdi(table.rowAtPoint(e.getPoint()));
+				final Arinc429TableModel m = ((Arinc429TableModel)table.getModel());
+				final int row = table.rowAtPoint(e.getPoint());
+				switch (table.columnAtPoint(e.getPoint())) {
+				case Arinc429TableModel.SDI:
+					m.toggleNoSdi(row);
+					break;
+				case Arinc429TableModel.CALC:
+					ConverterDialog dlg = new ConverterDialog(MainFrame.this, true, m.getConvertor(row), m.getLabelFilter().numberSystem);
+					Rectangle rect = dlg.getBounds();
+					rect.x = e.getXOnScreen();
+					rect.y = e.getYOnScreen();
+					dlg.setBounds(rect);
+					dlg.setVisible(true);
+					m.setConvertor(dlg.getConvertor());
+					break;
 				}
 			}
 		});		

@@ -10,8 +10,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -26,7 +28,8 @@ public class Arinc429TableModel extends AbstractTableModel {
 	public static final int DATA = 4;
 	public static final int SSM = 5;
 	public static final int PARITY = 6;
-	public static final int COLUMN_COUNT = 7;
+	public static final int CALC = 7;
+	public static final int COLUMN_COUNT = 8;
 	
 	public Arinc429TableModel() {
 		sequence = new Sequence();
@@ -36,6 +39,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		noSdiWords = new BitSet(256);
 		periodDetector = new PeriodDetector();
 		referenceTime = Instant.now();
+		convertors = new HashMap<>();
 	}
 	
 	@Override
@@ -65,6 +69,8 @@ public class Arinc429TableModel extends AbstractTableModel {
 			return "SSM 31 30";
 		case PARITY:
 			return String.format("Par (%s)", parityModeOdd ? "Odd*" : "Even");
+		case CALC:
+			return "Calc";
 		}
 
 		return null;
@@ -88,7 +94,9 @@ public class Arinc429TableModel extends AbstractTableModel {
 		case SSM:
 			return getSsmTextFrom(item.tmword.word);
 		case PARITY:
-			return getParityTextFrom(item.tmword.word);		
+			return getParityTextFrom(item.tmword.word);
+		case CALC:
+			return getCalcDataTextFrom(item.tmword.word);
 		}
 		
 		return null;
@@ -101,9 +109,9 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	public void put(TimeMarkedArinc429Word tmword) {
-		int id = tmword.word.getLabel() & 0xFF;
-		periodDetector.put(id, tmword.timemark);
-		SequenceItem item = new SequenceItem(tmword, periodDetector.get(id), periodDetector.getMin(id), periodDetector.getMax(id));
+		int label = tmword.word.getLabel();
+		periodDetector.put(label, tmword.timemark);
+		SequenceItem item = new SequenceItem(tmword, periodDetector.get(label), periodDetector.getMin(label), periodDetector.getMax(label));
 		sequence.put(item);
 		putToFilteredSequence(item);
 	}
@@ -132,7 +140,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	public void toggleNoSdi(int row) {
-		noSdiWords.flip(filteredSequence.get(row).tmword.word.getLabel() & 0xFF);
+		noSdiWords.flip(filteredSequence.get(row).tmword.word.getLabel());
 		fireTableDataChanged();
 	}
 	
@@ -153,8 +161,24 @@ public class Arinc429TableModel extends AbstractTableModel {
 		}
 	}
 	
+	public Convertor getConvertor(int row) {
+		int label = filteredSequence.get(row).tmword.word.getLabel();
+		Convertor conv = convertors.getOrDefault(label, null);
+		return conv != null ? conv : new Convertor(label);
+	}
+	
+	public void setConvertor(Convertor convertor) {
+		if (convertor.type != Convertor.Type.NULL) {
+			convertors.put(convertor.label, convertor);
+		} else {
+			convertors.remove(convertor.label);
+		}
+		
+		fireTableDataChanged();
+	}
+
 	private void putToFilteredSequence(SequenceItem item) {
-		if (labelFilter.isAccepted(item.tmword.word.getLabel() & 0xFF)) {
+		if (labelFilter.isAccepted(item.tmword.word.getLabel())) {
 			filteredSequence.put(item);
 			fireTableRowsInserted(filteredSequence.size() - 1, filteredSequence.size() - 1);
 		}
@@ -193,15 +217,15 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	private String getLabelTextFrom(Arinc429Word word) {
-		return labelFilter.numberSystem.integerToString(word.getLabel() & 0xFF, 8);
+		return labelFilter.numberSystem.integerToString(word.getLabel(), 8);
 	}
 
 	private String getSdiTextFrom(Arinc429Word word) {
-		return !noSdiWords.get(word.getLabel() & 0xFF) ? String.format("%d %d", word.getSdi() >> 1, word.getSdi() & 1) : "-";
+		return !noSdiWords.get(word.getLabel()) ? String.format("%d %d", word.getSdi() >> 1, word.getSdi() & 1) : "-";
 	}
 
 	private String getDataTextFrom(Arinc429Word word) {
-		if (!noSdiWords.get(word.getLabel() & 0xFF)) {
+		if (!noSdiWords.get(word.getLabel())) {
 			return String.format("%19s", Integer.toBinaryString(word.getData())).replace(' ', '0');
 		} else {
 			return String.format("%21s", Integer.toBinaryString((word.getData() << 2) + word.getSdi())).replace(' ', '0');
@@ -216,6 +240,11 @@ public class Arinc429TableModel extends AbstractTableModel {
 		return String.format("%s %d", word.isParityCorrect(parityModeOdd) ? "OK" : "FAIL", word.getParity());
 	}
 	
+	private String getCalcDataTextFrom(Arinc429Word word) {
+		Convertor conv = convertors.getOrDefault(word.getLabel(), null);
+		return conv != null ? String.format("%f", conv.getConverted(word)) : "";
+	}
+	
 	private final Sequence sequence;
 	private final Sequence filteredSequence;
 	private LabelFilter labelFilter;
@@ -225,4 +254,5 @@ public class Arinc429TableModel extends AbstractTableModel {
 	private boolean timeModeAbsolute;
 	private boolean periodModeRange;
 	private Instant referenceTime;
+	private final Map<Integer, Convertor> convertors;
 }
