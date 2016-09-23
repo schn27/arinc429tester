@@ -29,15 +29,14 @@ public class ConverterDialog extends javax.swing.JDialog {
 			hiBitValue.setText(Double.toString(convertor.hiBitValue));
 		}
 		
-		btnCode.setText(getConvertorTypeString());
+		btnCode.setText(getConvertorTypeString(this.convertor.type));
 	}
 	
 	public Convertor getConvertor() {
 		return convertor;
 	}
 	
-	private Convertor.Type getConvertorType() {
-		String text = btnCode.getText();
+	private static Convertor.Type getConvertorTypeFromString(String text) {
 		if (text.equalsIgnoreCase("Complement")) {
 			return Convertor.Type.COMPLEMENT;
 		} else if (text.equalsIgnoreCase("Direct")) {
@@ -49,8 +48,8 @@ public class ConverterDialog extends javax.swing.JDialog {
 		}
 	}
 	
-	private String getConvertorTypeString() {
-		switch (convertor.type) {
+	private static String getConvertorTypeString(Convertor.Type type) {
+		switch (type) {
 		case COMPLEMENT:
 			return "Complement";
 		case DIRECT:
@@ -59,6 +58,17 @@ public class ConverterDialog extends javax.swing.JDialog {
 			return "BCD";
 		default:
 			return "Complement";
+		}
+	}
+	
+	private static Convertor.Type getNextConvertorType(Convertor.Type type) {
+		switch (type) {
+		case COMPLEMENT:
+			return Convertor.Type.DIRECT;
+		case DIRECT:
+			return Convertor.Type.COMPLEMENT;
+		default:
+			return Convertor.Type.COMPLEMENT;
 		}
 	}
 
@@ -127,6 +137,11 @@ public class ConverterDialog extends javax.swing.JDialog {
         jPanel1.add(jLabel6);
 
         btnCode.setText("Complement");
+        btnCode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCodeActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnCode);
 
         btnOK.setText("OK");
@@ -181,7 +196,7 @@ public class ConverterDialog extends javax.swing.JDialog {
 		try {
 			convertor = new Convertor(
 					convertor.label, 
-					getConvertorType(), 
+					getConvertorTypeFromString(btnCode.getText()), 
 					Integer.parseInt(signBit.getText()),
 					Integer.parseInt(hiBit.getText()),
 					Integer.parseInt(loBit.getText()),
@@ -192,6 +207,10 @@ public class ConverterDialog extends javax.swing.JDialog {
 		
 		dispose();
     }//GEN-LAST:event_btnOKActionPerformed
+
+    private void btnCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCodeActionPerformed
+		btnCode.setText(getConvertorTypeString(getNextConvertorType(getConvertorTypeFromString(btnCode.getText()))));
+    }//GEN-LAST:event_btnCodeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCode;
