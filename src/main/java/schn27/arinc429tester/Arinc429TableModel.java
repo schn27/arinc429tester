@@ -123,7 +123,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	public void setLabelFilter(LabelFilter labelFilter) {
 		this.labelFilter = labelFilter;
 		filteredSequence.clear();
-		fireTableDataChanged();
+		fireTableStructureChanged();
 		List<SequenceItem> items = sequence.getList();
 		for (SequenceItem item : items) {
 			putToFilteredSequence(item);
