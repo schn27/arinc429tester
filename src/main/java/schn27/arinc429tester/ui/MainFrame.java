@@ -139,11 +139,15 @@ public class MainFrame extends javax.swing.JFrame {
         statusBar = new javax.swing.JLabel();
         javax.swing.JButton btnResetTime = new javax.swing.JButton();
         javax.swing.JButton btnResetPeriod = new javax.swing.JButton();
+        btnLoadCfg = new javax.swing.JButton();
+        btnSaveCfg = new javax.swing.JButton();
+        btnLoad = new javax.swing.JButton();
+        btnSave = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Arinc429Tester");
         setLocationByPlatform(true);
-        setMinimumSize(new java.awt.Dimension(300, 200));
+        setMinimumSize(new java.awt.Dimension(795, 200));
 
         btnOpen.setText("Open");
         btnOpen.setName(""); // NOI18N
@@ -161,8 +165,10 @@ public class MainFrame extends javax.swing.JFrame {
 
             }
         ));
+        table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
         table.setDoubleBuffered(true);
         table.setName(""); // NOI18N
+        table.setRowSelectionAllowed(false);
         table.getTableHeader().setReorderingAllowed(false);
         table.setVerifyInputWhenFocusTarget(false);
         tableScrollPane.setViewportView(table);
@@ -170,7 +176,7 @@ public class MainFrame extends javax.swing.JFrame {
             table.getColumnModel().getColumn(0).setResizable(false);
         }
 
-        statusBar.setText("345");
+        statusBar.setText("Message");
         statusBar.setToolTipText("");
 
         btnResetTime.setText("Reset Time");
@@ -188,33 +194,61 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        btnLoadCfg.setText("Load config");
+
+        btnSaveCfg.setText("Save config");
+
+        btnLoad.setText("Load");
+
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnResetTime)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnResetPeriod)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+            .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 795, Short.MAX_VALUE)
             .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnLoad, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnLoadCfg, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnResetTime, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnSaveCfg)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnResetPeriod))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnOpen)
-                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnResetTime)
-                    .addComponent(btnResetPeriod))
+                    .addComponent(btnLoadCfg)
+                    .addComponent(btnLoad)
+                    .addComponent(btnOpen))
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnResetPeriod)
+                    .addComponent(btnSaveCfg)
+                    .addComponent(btnSave))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableScrollPane)
-                .addGap(0, 0, 0)
+                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusBar))
         );
 
@@ -251,8 +285,16 @@ public class MainFrame extends javax.swing.JFrame {
         ((Arinc429TableModel)table.getModel()).clearPeriodDetector();
     }//GEN-LAST:event_btnResetPeriodActionPerformed
 
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSaveActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnLoad;
+    private javax.swing.JButton btnLoadCfg;
     private javax.swing.JButton btnOpen;
+    private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnSaveCfg;
     private javax.swing.JComboBox portName;
     private javax.swing.JLabel statusBar;
     private javax.swing.JTable table;
