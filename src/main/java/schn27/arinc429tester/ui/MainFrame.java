@@ -10,10 +10,13 @@ import java.time.Instant;
 import schn27.arinc429tester.Reader;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.arinc429tester.Arinc429TableModel;
-import schn27.arinc429tester.Convertor;
+import schn27.arinc429tester.ReadFilePort;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
+import schn27.serial.NullSerial;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -52,16 +55,13 @@ public class MainFrame extends javax.swing.JFrame {
 			}
 
 			@Override
-			public void componentMoved(ComponentEvent ce) {
-			}
+			public void componentMoved(ComponentEvent ce) {}
 
 			@Override
-			public void componentShown(ComponentEvent ce) {
-			}
+			public void componentShown(ComponentEvent ce) {}
 
 			@Override
-			public void componentHidden(ComponentEvent ce) {
-			}
+			public void componentHidden(ComponentEvent ce) {}
 		});
 	}
 	
@@ -195,10 +195,25 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnLoadCfg.setText("Load config");
+        btnLoadCfg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadCfgActionPerformed(evt);
+            }
+        });
 
         btnSaveCfg.setText("Save config");
+        btnSaveCfg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveCfgActionPerformed(evt);
+            }
+        });
 
         btnLoad.setText("Load");
+        btnLoad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadActionPerformed(evt);
+            }
+        });
 
         btnSave.setText("Save");
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -286,8 +301,49 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnResetPeriodActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        // TODO add your handling code here:
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Save as");
+		
+		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).saveState(fc.getSelectedFile().getPath());
+		}
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadActionPerformed
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Load from");
+		
+		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).loadState(fc.getSelectedFile().getPath());
+		}
+    }//GEN-LAST:event_btnLoadActionPerformed
+
+    private void btnLoadCfgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadCfgActionPerformed
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Load config from");
+		
+		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).loadConfig(fc.getSelectedFile().getPath());
+			updateStatusBar();
+		}
+    }//GEN-LAST:event_btnLoadCfgActionPerformed
+
+    private void btnSaveCfgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveCfgActionPerformed
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Save config as");
+		
+		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).saveConfig(fc.getSelectedFile().getPath());
+		}
+    }//GEN-LAST:event_btnSaveCfgActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLoad;

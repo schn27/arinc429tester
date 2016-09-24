@@ -5,6 +5,7 @@
  */
 package schn27.arinc429tester;
 
+import schn27.arinc429tester.serialize.Serializer;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.swing.table.AbstractTableModel;
+import schn27.arinc429tester.serialize.Config;
 
 /**
  *
@@ -176,7 +178,31 @@ public class Arinc429TableModel extends AbstractTableModel {
 		
 		fireTableDataChanged();
 	}
+	
+	public void loadState(String fileName) {
+		
+	}
 
+	public void saveState(String fileName) {
+		
+	}
+
+	public void loadConfig(String fileName) {
+		Config config = Serializer.loadConfig(fileName);
+		if (config != null) {
+			labelFilter = config.labelFilter;
+			noSdiWords = config.noSdiWords;
+			convertors = config.convertors;
+			fireTableStructureChanged();
+		} else {
+			System.out.println("null");
+		}
+	}
+
+	public void saveConfig(String fileName) {
+		Serializer.saveConfig(fileName, new Config(labelFilter, noSdiWords, convertors));
+	}
+	
 	private void putToFilteredSequence(SequenceItem item) {
 		if (labelFilter.isAccepted(item.tmword.word.getLabel())) {
 			filteredSequence.put(item);
@@ -245,14 +271,14 @@ public class Arinc429TableModel extends AbstractTableModel {
 		return conv != null ? String.format("%f", conv.getConverted(word)) : "";
 	}
 	
-	private final Sequence sequence;
+	private Sequence sequence;
 	private final Sequence filteredSequence;
 	private LabelFilter labelFilter;
 	private boolean parityModeOdd;
-	private final BitSet noSdiWords;
+	private BitSet noSdiWords;
 	private final PeriodDetector periodDetector;
 	private boolean timeModeAbsolute;
 	private boolean periodModeRange;
 	private Instant referenceTime;
-	private final Map<Integer, Convertor> convertors;
+	private Map<Integer, Convertor> convertors;
 }
