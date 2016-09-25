@@ -199,7 +199,7 @@ public final class Serializer {
 		state.sequence.getList().forEach((item) -> {
 			JsonObject itemJson = new JsonObject();
 			itemJson.put("time", item.tmword.timemark.toEpochMilli());
-			itemJson.put("word", ((long)item.tmword.word.raw) & 0xFFFFFFFF);
+			itemJson.put("word", item.tmword.word.raw & 0xFFFFFFFFL);
 			itemJson.put("period", item.period);
 			itemJson.put("minperiod", item.minPeriod);
 			itemJson.put("maxperiod", item.maxPeriod);
