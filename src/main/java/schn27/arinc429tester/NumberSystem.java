@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schn27.arinc429tester.bl;
+package schn27.arinc429tester;
 
 /**
  *

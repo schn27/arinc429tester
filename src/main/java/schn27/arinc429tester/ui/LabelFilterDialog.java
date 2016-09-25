@@ -6,8 +6,8 @@
 package schn27.arinc429tester.ui;
 
 import javax.swing.table.DefaultTableModel;
-import schn27.arinc429tester.bl.LabelFilter;
-import schn27.arinc429tester.bl.NumberSystem;
+import schn27.arinc429tester.LabelFilter;
+import schn27.arinc429tester.NumberSystem;
 
 /**
  *

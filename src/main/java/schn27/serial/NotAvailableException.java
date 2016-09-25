@@ -3,13 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schn27.arinc429tester.bl;
+package schn27.serial;
 
 /**
  *
  * @author amalikov
  */
-public interface SequenceChangedListener {
-	void onSequenceAdded(int size);
-	void onSequenceCleared();
+public class NotAvailableException extends Exception {
+	public NotAvailableException() {}
+	
+	public NotAvailableException(String message) {
+		super(message);
+	}
 }

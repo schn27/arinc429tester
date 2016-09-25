@@ -1,14 +1,14 @@
-package schn27.arinc429tester.bl;
+package schn27.arinc429tester;
 
 public class Arinc429Word {
 	public Arinc429Word(int raw) {
 		this.raw = raw;
 	}
 	
-	public Arinc429Word(byte label, byte sdi, int pad, byte ssm) {
-		int v = ((reverseByte(label) & 0xFF) | 
+	public Arinc429Word(int label, byte sdi, int data, byte ssm) {
+		int v = (label | 
 				((sdi & 3) << 8) | 
-				((pad & ((1 << 18) - 1)) << 10) | 
+				((data & ((1 << 19) - 1)) << 10) | 
 				((ssm & 3) << 29)) & 0x7FFFFFFF;
 		
 		if (!getWordParity(v)) {
@@ -26,20 +26,20 @@ public class Arinc429Word {
 		return (byte)((raw >> 31) & 1);
 	}
 	
-	public byte getSSM() {
+	public byte getSsm() {
 		return (byte)((raw >> 29) & 3);
 	}
 	
-	public int getPad() {
-		return (raw >> 10) & ((1 << 18) - 1);
+	public int getData() {
+		return (raw >> 10) & ((1 << 19) - 1);
 	}
 	
-	public byte getSDI() {
+	public byte getSdi() {
 		return (byte)((raw >> 8) & 3);
 	}
 	
-	public byte getLabel() {
-		return reverseByte((byte)(raw & 0xFF));
+	public int getLabel() {
+		return raw & 0xFF;
 	}
 	
 	private boolean getWordParity(int value) {
@@ -50,11 +50,5 @@ public class Arinc429Word {
 		return ((x ^ (x >> 1)) & 1) == 1;
 	}
 
-	private byte reverseByte(byte x) {
-		x = (byte)(((x >> 1) & 0x55) | ((x & 0x55) << 1));
-		x = (byte)(((x >> 2) & 0x33) | ((x & 0x33) << 2));
-		return (byte)(((x >> 4) & 0x0F) | (x << 4));
-	}	
-	
 	public final int raw;
 }

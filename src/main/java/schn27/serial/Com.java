@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
@@ -23,7 +24,7 @@ public class Com implements Serial {
 	}
 	
 	public static List<String> getList() {
-		return Arrays.asList(SerialPortList.getPortNames());
+		return Arrays.stream(SerialPortList.getPortNames()).collect(Collectors.toList());
 	}
 	
 	@Override
@@ -47,7 +48,7 @@ public class Com implements Serial {
 	}
 	
 	@Override
-	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException {
+	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
 		try {
 			rwLock.readLock().lock();
 			return readImpl(buffer, ofs, size, timeout);
@@ -118,7 +119,7 @@ public class Com implements Serial {
 		port = null;
 	}
 
-	private int readImpl(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException {
+	private int readImpl(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
 		try {
 			byte[] read = port.readBytes(size, timeout);
 
@@ -128,7 +129,7 @@ public class Com implements Serial {
 			
 			return size;
 		} catch (SerialPortException ex) {
-			log.log(Level.SEVERE, "exception", ex);
+			throw new NotAvailableException(ex.getMessage());
 		} catch (SerialPortTimeoutException ex) {
 		}
 
