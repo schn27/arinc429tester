@@ -13,10 +13,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.arinc429tester.Arinc429TableModel;
-import schn27.arinc429tester.ReadFilePort;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
-import schn27.serial.NullSerial;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -126,6 +124,10 @@ public class MainFrame extends javax.swing.JFrame {
 	private void updateOpenedState() {
 		portName.setEnabled(reader == null);
 		btnOpen.setText(reader == null ? "Open" : "Close");		
+	}
+	
+	private static String addExtension(String fileName, String extension) {
+		return fileName.endsWith(extension) ? fileName : fileName + extension;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -307,7 +309,7 @@ public class MainFrame extends javax.swing.JFrame {
 		fc.setDialogTitle("Save as");
 		
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-			((Arinc429TableModel)table.getModel()).saveState(fc.getSelectedFile().getPath());
+			((Arinc429TableModel)table.getModel()).saveState(addExtension(fc.getSelectedFile().getPath(), ".json"));
 		}
     }//GEN-LAST:event_btnSaveActionPerformed
 
@@ -342,7 +344,7 @@ public class MainFrame extends javax.swing.JFrame {
 		fc.setDialogTitle("Save config as");
 		
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-			((Arinc429TableModel)table.getModel()).saveConfig(fc.getSelectedFile().getPath());
+			((Arinc429TableModel)table.getModel()).saveConfig(addExtension(fc.getSelectedFile().getPath(), ".json"));
 		}
     }//GEN-LAST:event_btnSaveCfgActionPerformed
 
