@@ -319,6 +319,7 @@ public class MainFrame extends javax.swing.JFrame {
 		
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			((Arinc429TableModel)table.getModel()).loadState(fc.getSelectedFile().getPath());
+			updateStatusBar();
 		}
     }//GEN-LAST:event_btnLoadActionPerformed
 

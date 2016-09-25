@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.swing.table.AbstractTableModel;
 import schn27.arinc429tester.serialize.Config;
+import schn27.arinc429tester.serialize.State;
 
 /**
  *
@@ -180,27 +181,31 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 	
 	public void loadState(String fileName) {
-		
+		State state = Serializer.loadState(fileName);
+		if (state != null) {
+			sequence = state.sequence;
+			applyConfig(state.config);
+		}
 	}
 
 	public void saveState(String fileName) {
-		
+		Serializer.saveState(fileName, new State(sequence, new Config(labelFilter, noSdiWords, convertors)));
 	}
 
 	public void loadConfig(String fileName) {
-		Config config = Serializer.loadConfig(fileName);
-		if (config != null) {
-			labelFilter = config.labelFilter;
-			noSdiWords = config.noSdiWords;
-			convertors = config.convertors;
-			fireTableStructureChanged();
-		} else {
-			System.out.println("null");
-		}
+		applyConfig(Serializer.loadConfig(fileName));
 	}
 
 	public void saveConfig(String fileName) {
 		Serializer.saveConfig(fileName, new Config(labelFilter, noSdiWords, convertors));
+	}
+	
+	private void applyConfig(Config config) {
+		if (config != null) {
+			noSdiWords = config.noSdiWords;
+			convertors = config.convertors;
+			setLabelFilter(config.labelFilter);
+		}		
 	}
 	
 	private void putToFilteredSequence(SequenceItem item) {
