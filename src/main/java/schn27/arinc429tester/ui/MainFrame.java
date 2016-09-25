@@ -10,8 +10,9 @@ import java.time.Instant;
 import schn27.arinc429tester.Reader;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.arinc429tester.Arinc429TableModel;
-import schn27.arinc429tester.Convertor;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
 
@@ -52,16 +53,13 @@ public class MainFrame extends javax.swing.JFrame {
 			}
 
 			@Override
-			public void componentMoved(ComponentEvent ce) {
-			}
+			public void componentMoved(ComponentEvent ce) {}
 
 			@Override
-			public void componentShown(ComponentEvent ce) {
-			}
+			public void componentShown(ComponentEvent ce) {}
 
 			@Override
-			public void componentHidden(ComponentEvent ce) {
-			}
+			public void componentHidden(ComponentEvent ce) {}
 		});
 	}
 	
@@ -128,6 +126,10 @@ public class MainFrame extends javax.swing.JFrame {
 		btnOpen.setText(reader == null ? "Open" : "Close");		
 	}
 	
+	private static String addExtension(String fileName, String extension) {
+		return fileName.endsWith(extension) ? fileName : fileName + extension;
+	}
+	
 	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -139,11 +141,15 @@ public class MainFrame extends javax.swing.JFrame {
         statusBar = new javax.swing.JLabel();
         javax.swing.JButton btnResetTime = new javax.swing.JButton();
         javax.swing.JButton btnResetPeriod = new javax.swing.JButton();
+        btnLoadCfg = new javax.swing.JButton();
+        btnSaveCfg = new javax.swing.JButton();
+        btnLoad = new javax.swing.JButton();
+        btnSave = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Arinc429Tester");
         setLocationByPlatform(true);
-        setMinimumSize(new java.awt.Dimension(300, 200));
+        setMinimumSize(new java.awt.Dimension(795, 200));
 
         btnOpen.setText("Open");
         btnOpen.setName(""); // NOI18N
@@ -161,8 +167,10 @@ public class MainFrame extends javax.swing.JFrame {
 
             }
         ));
+        table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
         table.setDoubleBuffered(true);
         table.setName(""); // NOI18N
+        table.setRowSelectionAllowed(false);
         table.getTableHeader().setReorderingAllowed(false);
         table.setVerifyInputWhenFocusTarget(false);
         tableScrollPane.setViewportView(table);
@@ -170,7 +178,7 @@ public class MainFrame extends javax.swing.JFrame {
             table.getColumnModel().getColumn(0).setResizable(false);
         }
 
-        statusBar.setText("345");
+        statusBar.setText("Message");
         statusBar.setToolTipText("");
 
         btnResetTime.setText("Reset Time");
@@ -188,33 +196,76 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        btnLoadCfg.setText("Load config");
+        btnLoadCfg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadCfgActionPerformed(evt);
+            }
+        });
+
+        btnSaveCfg.setText("Save config");
+        btnSaveCfg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveCfgActionPerformed(evt);
+            }
+        });
+
+        btnLoad.setText("Load");
+        btnLoad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadActionPerformed(evt);
+            }
+        });
+
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnResetTime)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnResetPeriod)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+            .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 795, Short.MAX_VALUE)
             .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnLoad, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnLoadCfg, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnResetTime, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnSaveCfg)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnResetPeriod))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnOpen)
-                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnResetTime)
-                    .addComponent(btnResetPeriod))
+                    .addComponent(btnLoadCfg)
+                    .addComponent(btnLoad)
+                    .addComponent(btnOpen))
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnResetPeriod)
+                    .addComponent(btnSaveCfg)
+                    .addComponent(btnSave))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableScrollPane)
-                .addGap(0, 0, 0)
+                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusBar))
         );
 
@@ -251,8 +302,58 @@ public class MainFrame extends javax.swing.JFrame {
         ((Arinc429TableModel)table.getModel()).clearPeriodDetector();
     }//GEN-LAST:event_btnResetPeriodActionPerformed
 
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Save as");
+		
+		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).saveState(addExtension(fc.getSelectedFile().getPath(), ".json"));
+		}
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadActionPerformed
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Load from");
+		
+		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).loadState(fc.getSelectedFile().getPath());
+			updateStatusBar();
+		}
+    }//GEN-LAST:event_btnLoadActionPerformed
+
+    private void btnLoadCfgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadCfgActionPerformed
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Load config from");
+		
+		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).loadConfig(fc.getSelectedFile().getPath());
+			updateStatusBar();
+		}
+    }//GEN-LAST:event_btnLoadCfgActionPerformed
+
+    private void btnSaveCfgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveCfgActionPerformed
+		JFileChooser fc = new JFileChooser();
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.setDialogTitle("Save config as");
+		
+		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			((Arinc429TableModel)table.getModel()).saveConfig(addExtension(fc.getSelectedFile().getPath(), ".json"));
+		}
+    }//GEN-LAST:event_btnSaveCfgActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnLoad;
+    private javax.swing.JButton btnLoadCfg;
     private javax.swing.JButton btnOpen;
+    private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnSaveCfg;
     private javax.swing.JComboBox portName;
     private javax.swing.JLabel statusBar;
     private javax.swing.JTable table;
