@@ -23,6 +23,7 @@
  */
 package schn27.arinc429tester.ui;
 
+import java.util.Locale;
 import schn27.arinc429tester.Convertor;
 import schn27.arinc429tester.NumberSystem;
 
@@ -44,7 +45,7 @@ public class ConverterDialog extends javax.swing.JDialog {
 			signBit.setText(Integer.toString(convertor.signBit));
 			hiBit.setText(Integer.toString(convertor.hiBit));
 			loBit.setText(Integer.toString(convertor.loBit));
-			hiBitValue.setText(Double.toString(convertor.hiBitValue));
+			hiBitValue.setText(String.format(Locale.ENGLISH, "%f", convertor.hiBitValue));
 		}
 		
 		btnCode.setText(getConvertorTypeString(this.convertor.type));

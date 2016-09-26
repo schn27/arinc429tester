@@ -291,7 +291,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	
 	private String getCalcDataTextFrom(Arinc429Word word) {
 		Convertor conv = convertors.getOrDefault(word.getLabel(), null);
-		return conv != null ? String.format("%f", conv.getConverted(word)) : "";
+		return conv != null ? String.format(Locale.ENGLISH, "%f", conv.getConverted(word)) : "";
 	}
 	
 	private Sequence sequence;
