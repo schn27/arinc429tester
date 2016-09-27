@@ -31,9 +31,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
 import schn27.arinc429tester.Reader;
-import java.util.List;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.arinc429tester.Arinc429TableModel;
 import schn27.arinc429tester.SerialFactory;
@@ -46,13 +46,29 @@ public class MainFrame extends javax.swing.JFrame {
 		initPortList();
 		initTable();
 		updateStatusBar();
+
+		portName.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				initPortList();
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {}
+		});
 	}
 
 	private void initPortList() {
-		List<String> ports = SerialFactory.getList();
-		DefaultComboBoxModel<String> m = (DefaultComboBoxModel<String>)portName.getModel();
-		for (String port : ports) {
-			m.addElement(port);
+		Object selected = portName.getSelectedItem();
+		
+		portName.removeAllItems();
+		SerialFactory.getList().forEach((port) -> portName.addItem(port));
+		
+		if (selected != null) {
+			portName.setSelectedItem(selected);
 		}
 	}
 
