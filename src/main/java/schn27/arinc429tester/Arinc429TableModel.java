@@ -145,10 +145,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		this.labelFilter = labelFilter;
 		filteredSequence.clear();
 		fireTableStructureChanged();
-		List<SequenceItem> items = sequence.getList();
-		for (SequenceItem item : items) {
-			putToFilteredSequence(item);
-		}
+		sequence.getList().forEach((item) -> putToFilteredSequence(item));
 	}
 	
 	public void clearPeriodDetector() {
