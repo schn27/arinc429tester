@@ -1,3 +1,26 @@
+/* 
+ * The MIT License
+ *
+ * Copyright 2016 Aleksandr Malikov <schn27@gmail.com>.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package schn27.arinc429tester.ui;
 
 import java.awt.Point;
@@ -8,9 +31,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
 import schn27.arinc429tester.Reader;
-import java.util.List;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.arinc429tester.Arinc429TableModel;
 import schn27.arinc429tester.SerialFactory;
@@ -23,13 +46,29 @@ public class MainFrame extends javax.swing.JFrame {
 		initPortList();
 		initTable();
 		updateStatusBar();
+
+		portName.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				initPortList();
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {}
+		});
 	}
 
 	private void initPortList() {
-		List<String> ports = SerialFactory.getList();
-		DefaultComboBoxModel<String> m = (DefaultComboBoxModel<String>)portName.getModel();
-		for (String port : ports) {
-			m.addElement(port);
+		Object selected = portName.getSelectedItem();
+		
+		portName.removeAllItems();
+		SerialFactory.getList().forEach((port) -> portName.addItem(port));
+		
+		if (selected != null) {
+			portName.setSelectedItem(selected);
 		}
 	}
 
@@ -47,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
 				Rectangle viewRect = tableScrollPane.getViewport().getViewRect();
 				int last = table.rowAtPoint(new Point(0, viewRect.y + viewRect.height - 1));
 				
-				if (last >= table.getRowCount() - 2) {
+				if (last >= table.getRowCount() - 5) {
 					table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
 				}				
 			}
