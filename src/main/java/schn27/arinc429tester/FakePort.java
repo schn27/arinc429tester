@@ -35,6 +35,11 @@ import schn27.utils.BitReverser;
 public class FakePort implements Serial {
 
 	public FakePort() {
+		this(true);
+	}
+	
+	public FakePort(boolean workaround) {
+		this.workaround = workaround;
 		buffer = new byte[5];
 		pos = buffer.length;
 	}
@@ -75,7 +80,7 @@ public class FakePort implements Serial {
 				(int)(Math.random() * (1 << 19)),
 				(byte)(Math.random() * (1 << 2)));
 		
-		int w = BitReverser.reverse(word.raw);
+		int w = BitReverser.reverse(workaround ? doWorkaround(word.raw) : word.raw);
 		for (int i = 0; i < buffer.length; ++i) {
 			buffer[i] = (byte)(((i == 0) ? (byte)0x80 : 0) | (byte)((w >> 25) & 0x7f));
 			w <<= 7;
@@ -83,6 +88,15 @@ public class FakePort implements Serial {
 		pos = 0;
 	}
 	
+	private int doWorkaround(int x) {
+		return 
+				(x & 0xFF) |
+				((BitReverser.reverse((byte)(x >> 8)) & 0xFF) << 8) | 
+				((BitReverser.reverse((byte)(x >> 16)) & 0xFF) << 16) | 
+				((BitReverser.reverse((byte)(x >> 24)) & 0xFF) << 24);
+	}
+	
+	private final boolean workaround;
 	private final byte[] buffer;
 	private int pos;
 }
