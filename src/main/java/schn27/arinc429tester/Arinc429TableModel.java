@@ -85,7 +85,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		case SDI:
 			return "SDI 10 9";
 		case DATA:
-			return "Data";
+			return "Data 29-11 (10 9)";
 		case SSM:
 			return "SSM 31 30";
 		case PARITY:
