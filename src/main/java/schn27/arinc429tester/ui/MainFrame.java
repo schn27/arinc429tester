@@ -86,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
 				Rectangle viewRect = tableScrollPane.getViewport().getViewRect();
 				int last = table.rowAtPoint(new Point(0, viewRect.y + viewRect.height - 1));
 				
-				if (last >= table.getRowCount() - 2) {
+				if (last >= table.getRowCount() - 5) {
 					table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
 				}				
 			}
