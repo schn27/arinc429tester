@@ -83,10 +83,9 @@ public class MainFrame extends javax.swing.JFrame {
 		table.addComponentListener(new ComponentListener() {
 			@Override
 			public void componentResized(ComponentEvent ce) {
-				Rectangle viewRect = tableScrollPane.getViewport().getViewRect();
-				int last = table.rowAtPoint(new Point(0, viewRect.y + viewRect.height - 1));
+				int percent = tableScrollPane.getVerticalScrollBar().getValue() * 100 / tableScrollPane.getVerticalScrollBar().getMaximum();
 				
-				if (last >= table.getRowCount() - 5) {
+				if (percent >= 98) {
 					table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
 				}				
 			}

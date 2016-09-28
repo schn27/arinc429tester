@@ -70,7 +70,7 @@ public class FakePort implements Serial {
 	
 	private void fillBuffer() {
 		try {
-			Thread.sleep(100);
+			Thread.sleep(1);
 		} catch (InterruptedException ex) {
 		}		
 		

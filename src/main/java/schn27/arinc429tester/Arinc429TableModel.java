@@ -81,7 +81,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		case PERIOD:
 			return String.format("Period, ms (%s)", periodModeRange ? "Range" : "Current");
 		case LABEL:
-			return String.format("Label (%s)", labelFilter.numberSystem);
+			return String.format("Label (%s) 1-8", labelFilter.numberSystem);
 		case SDI:
 			return "SDI 10 9";
 		case DATA:
@@ -89,7 +89,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		case SSM:
 			return "SSM 31 30";
 		case PARITY:
-			return String.format("Par (%s)", parityModeOdd ? "Odd*" : "Even");
+			return String.format("Par (%s) 32", parityModeOdd ? "Odd*" : "Even");
 		case CALC:
 			return "Calc";
 		}
