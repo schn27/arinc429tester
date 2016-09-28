@@ -30,6 +30,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
+import javax.swing.BoundedRangeModel;
 import schn27.arinc429tester.Reader;
 import javax.swing.JFileChooser;
 import javax.swing.event.PopupMenuEvent;
@@ -83,9 +84,9 @@ public class MainFrame extends javax.swing.JFrame {
 		table.addComponentListener(new ComponentListener() {
 			@Override
 			public void componentResized(ComponentEvent ce) {
-				int percent = tableScrollPane.getVerticalScrollBar().getValue() * 100 / tableScrollPane.getVerticalScrollBar().getMaximum();
+				BoundedRangeModel m = tableScrollPane.getVerticalScrollBar().getModel();
 				
-				if (percent >= 98) {
+				if ((m.getValue() + m.getExtent()) * 100 / m.getMaximum() >= 95) {
 					table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
 				}				
 			}
