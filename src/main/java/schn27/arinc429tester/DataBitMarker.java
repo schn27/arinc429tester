@@ -48,27 +48,31 @@ public class DataBitMarker {
 	public final void setColors(List<Entry> colors) {
 		this.colors = new ArrayList<>(colors);
 		colorsMap = new HashMap<>();
-		colors.forEach((color) -> colorsMap.put(color.bitNumber, color.color));
+		colors.forEach((color) -> {
+			if (color.bitNumber > 0) {
+				colorsMap.put(color.bitNumber, color.color);
+			}
+		});
 	}
 	
 	public String getHtmlText(String text) {
-		if (colorsMap.isEmpty()) {
-			return text;
-		}
-	
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
-		
-		int bitNumber = 29;
-		
-		for (char c : text.toCharArray()) {
-			if (colorsMap.containsKey(bitNumber)) {
-				sb.append(String.format("<span style=\"background:#%x\">%c</span>", colorsMap.get(bitNumber), c));
-			} else {
-				sb.append(c);
+
+		if (colorsMap.isEmpty()) {
+			sb.append(text);
+		} else {
+			int bitNumber = 29;
+
+			for (char c : text.toCharArray()) {
+				if (colorsMap.containsKey(bitNumber)) {
+					sb.append(String.format("<span style=\"background:#%x\">%c</span>", colorsMap.get(bitNumber), c));
+				} else {
+					sb.append(c);
+				}
+
+				--bitNumber;			
 			}
-			
-			--bitNumber;			
 		}
 		
 		sb.append("</html>");

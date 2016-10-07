@@ -30,6 +30,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.swing.table.AbstractTableModel;
@@ -60,7 +61,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		periodDetector = new PeriodDetector();
 		referenceTime = Instant.now();
 		convertors = new HashMap<>();
-		dataBitsColors = new HashMap<>();
+		dataBitMarker = new DataBitMarker();
 	}
 	
 	@Override
@@ -111,7 +112,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		case SDI:
 			return getSdiTextFrom(item.tmword.word);
 		case DATA:
-			return getHtmlDataText(getDataTextFrom(item.tmword.word));
+			return dataBitMarker.getHtmlText(getDataTextFrom(item.tmword.word));
 		case SSM:
 			return getSsmTextFrom(item.tmword.word);
 		case PARITY:
@@ -215,8 +216,8 @@ public class Arinc429TableModel extends AbstractTableModel {
 		Serializer.saveConfig(fileName, new Config(labelFilter, noSdiWords, convertors));
 	}
 	
-	public void setDataBitsColors(Map<Integer, Integer> dataBitsColors) {
-		this.dataBitsColors = dataBitsColors;
+	public void setDataBitsColors(List<DataBitMarker.Entry> dataBitsColors) {
+		dataBitMarker.setColors(dataBitsColors);
 		fireTableDataChanged();
 	}
 	
@@ -296,30 +297,6 @@ public class Arinc429TableModel extends AbstractTableModel {
 		return conv != null ? String.format(Locale.ENGLISH, "%f", conv.getConverted(word)) : "";
 	}
 	
-	private String getHtmlDataText(String text) {
-		if (dataBitsColors.isEmpty()) {
-			return text;
-		}
-	
-		StringBuilder sb = new StringBuilder();
-		sb.append("<html>");
-		
-		int bitNumber = 29;
-		
-		for (char c : text.toCharArray()) {
-			if (dataBitsColors.containsKey(bitNumber)) {
-				sb.append(String.format("<span style=\"background:#%x\">%c</span>", dataBitsColors.get(bitNumber), c));
-			} else {
-				sb.append(c);
-			}
-			
-			--bitNumber;			
-		}
-		
-		sb.append("</html>");
-		return sb.toString();
-	}
-	
 	private Sequence sequence;
 	private final Sequence filteredSequence;
 	private LabelFilter labelFilter;
@@ -330,5 +307,5 @@ public class Arinc429TableModel extends AbstractTableModel {
 	private boolean periodModeRange;
 	private Instant referenceTime;
 	private Map<Integer, Convertor> convertors;
-	private Map<Integer, Integer> dataBitsColors;
+	private DataBitMarker dataBitMarker;
 }

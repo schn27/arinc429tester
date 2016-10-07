@@ -30,7 +30,9 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.BoundedRangeModel;
 import schn27.arinc429tester.Reader;
@@ -40,6 +42,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.arinc429tester.Arinc429TableModel;
+import schn27.arinc429tester.DataBitMarker;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
 
@@ -434,17 +437,17 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSaveCfgActionPerformed
 
     private void btnApplyColorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyColorsActionPerformed
-        Map<Integer, Integer> colors = new HashMap<>();
+        List<DataBitMarker.Entry> colors = new ArrayList<>();
 		addToColors(colors, dataBit1);
 		addToColors(colors, dataBit2);
 		addToColors(colors, dataBit3);
 		((Arinc429TableModel)table.getModel()).setDataBitsColors(colors);
     }//GEN-LAST:event_btnApplyColorsActionPerformed
 
-	private void addToColors(Map<Integer, Integer> colors, JTextField textField) {
+	private void addToColors(List<DataBitMarker.Entry> colors, JTextField textField) {
 		if (!textField.getText().isEmpty()) {
 			try {
-				colors.put(Integer.parseInt(textField.getText()), textField.getBackground().getRGB() & 0xFFFFFF);
+				colors.add(new DataBitMarker.Entry(Integer.parseInt(textField.getText()), textField.getBackground().getRGB() & 0xFFFFFF));
 			} catch (NumberFormatException ex) {
 				textField.setText("");
 			}
