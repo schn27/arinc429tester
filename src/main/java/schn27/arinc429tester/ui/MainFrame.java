@@ -86,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
 			public void componentResized(ComponentEvent ce) {
 				BoundedRangeModel m = tableScrollPane.getVerticalScrollBar().getModel();
 				
-				if ((m.getValue() + m.getExtent()) * 100 / m.getMaximum() >= 95) {
+				if (m.getMaximum() > 0 && (m.getValue() + m.getExtent()) * 100 / m.getMaximum() >= 95) {
 					table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
 				}				
 			}
