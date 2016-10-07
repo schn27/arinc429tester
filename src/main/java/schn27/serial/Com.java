@@ -25,8 +25,6 @@ package schn27.serial;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -43,7 +41,6 @@ public class Com implements Serial {
 	public Com(String portName, int baudRate) {
 		this.portName = portName;
 		this.baudRate = baudRate;
-		rwLock = new ReentrantReadWriteLock();
 	}
 	
 	public static List<String> getList() {
@@ -52,55 +49,6 @@ public class Com implements Serial {
 	
 	@Override
 	public void open() {
-		try {
-			rwLock.writeLock().lock();
-			openImpl();
-		} finally {
-			rwLock.writeLock().unlock();
-		}
-	}
-	
-	@Override
-	public void close() {
-		try {
-			rwLock.writeLock().lock();
-			closeImpl();
-		} finally {
-			rwLock.writeLock().unlock();
-		}
-	}
-	
-	@Override
-	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
-		try {
-			rwLock.readLock().lock();
-			return readImpl(buffer, ofs, size, timeout);
-		} finally {
-			rwLock.readLock().unlock();
-		}
-	}
-	
-	@Override
-	public void write(byte[] buffer, int ofs, int size) {
-		try {
-			rwLock.writeLock().lock();
-			writeImpl(buffer, ofs, size);
-		} finally {
-			rwLock.writeLock().unlock();
-		}
-	}
-	
-	@Override
-	public void clean() {
-		try {
-			rwLock.readLock().lock();
-			cleanImpl();
-		} finally {
-			rwLock.readLock().unlock();
-		}
-	}
-	
-	private void openImpl() {
 		if (port != null) {
 			return;
 		}
@@ -110,7 +58,7 @@ public class Com implements Serial {
 		log.log(Level.INFO, "Opening port {0}", portName);
 
 		try {
-			port = openSerialPort();
+			port = new SerialPort(portName);
 			port.openPort();
 			port.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 			port.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
@@ -122,7 +70,8 @@ public class Com implements Serial {
 		log.log(Level.INFO, "Opening port {0} done", portName);
 	}
 	
-	private void closeImpl() {
+	@Override
+	public void close() {
 		if (port == null) {
 			return;
 		}
@@ -142,24 +91,28 @@ public class Com implements Serial {
 		port = null;
 	}
 
-	private int readImpl(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
-		try {
-			byte[] read = port.readBytes(size, timeout);
+	@Override
+	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
+		if (port != null) {
+			try {
+				byte[] read = port.readBytes(size, timeout);
 
-			for (int i = 0; i < size; ++i) {	
-				buffer[i + ofs] = read[i];
+				for (int i = 0; i < size; ++i) {	
+					buffer[i + ofs] = read[i];
+				}
+
+				return size;
+			} catch (SerialPortException ex) {
+				throw new NotAvailableException(ex.getMessage());
+			} catch (SerialPortTimeoutException ex) {
 			}
-			
-			return size;
-		} catch (SerialPortException ex) {
-			throw new NotAvailableException(ex.getMessage());
-		} catch (SerialPortTimeoutException ex) {
 		}
 
 		return 0;
 	}
 	
-	private void writeImpl(byte[] buffer, int ofs, int size) {
+	@Override
+	public void write(byte[] buffer, int ofs, int size) {
 		try {
 			if (port != null && buffer != null) {
 				port.writeBytes(Arrays.copyOfRange(buffer, ofs, ofs + size));
@@ -169,7 +122,8 @@ public class Com implements Serial {
 		}
 	}
 	
-	private void cleanImpl() {
+	@Override
+	public void clean() {
 		if (port != null) {
 			try {
 				port.purgePort(
@@ -181,15 +135,9 @@ public class Com implements Serial {
 		}
 	}
 	
-	private SerialPort openSerialPort() {
-		return new SerialPort(portName);
-	}
-	
 	private final String portName;
 	private final int baudRate;
 	private SerialPort port;
-	
-	private final ReadWriteLock rwLock;
 	
 	private static final Logger log = Logger.getLogger(Com.class.getName());
 }
