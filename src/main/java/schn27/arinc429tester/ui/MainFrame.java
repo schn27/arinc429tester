@@ -30,13 +30,19 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.BoundedRangeModel;
 import schn27.arinc429tester.Reader;
 import javax.swing.JFileChooser;
+import javax.swing.JTextField;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import schn27.arinc429tester.Arinc429TableModel;
+import schn27.arinc429tester.DataBitMarker;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
 
@@ -86,7 +92,7 @@ public class MainFrame extends javax.swing.JFrame {
 			public void componentResized(ComponentEvent ce) {
 				BoundedRangeModel m = tableScrollPane.getVerticalScrollBar().getModel();
 				
-				if ((m.getValue() + m.getExtent()) * 100 / m.getMaximum() >= 95) {
+				if (m.getMaximum() > 0 && (m.getValue() + m.getExtent()) * 100 / m.getMaximum() >= 95) {
 					table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
 				}				
 			}
@@ -165,6 +171,23 @@ public class MainFrame extends javax.swing.JFrame {
 		btnOpen.setText(reader == null ? "Open" : "Close");		
 	}
 	
+	private void updateDataBitsColors() {
+		List<DataBitMarker.Entry> colors = ((Arinc429TableModel)table.getModel()).getDataBitsColors();
+		
+		JTextField dataBits[] = {dataBit1, dataBit2, dataBit3};
+		
+		for (JTextField dataBit : dataBits) {
+			dataBit.setText("");
+		}
+		
+		try {
+			for (int i = 0; i < dataBits.length; ++i) {
+				dataBits[i].setText(colors.get(i).bitNumber > 0 ? Integer.toString(colors.get(i).bitNumber) : "");
+			}
+		} catch (IndexOutOfBoundsException ex) {
+		}
+	}
+	
 	private static String addExtension(String fileName, String extension) {
 		return fileName.endsWith(extension) ? fileName : fileName + extension;
 	}
@@ -184,6 +207,11 @@ public class MainFrame extends javax.swing.JFrame {
         btnSaveCfg = new javax.swing.JButton();
         btnLoad = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        dataBit1 = new javax.swing.JTextField();
+        dataBit2 = new javax.swing.JTextField();
+        dataBit3 = new javax.swing.JTextField();
+        javax.swing.JButton btnApplyColors = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Arinc429Tester");
@@ -263,6 +291,29 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("Data bits");
+
+        dataBit1.setBackground(new java.awt.Color(153, 204, 255));
+        dataBit1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        dataBit1.setToolTipText("");
+        dataBit1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        dataBit2.setBackground(new java.awt.Color(255, 153, 153));
+        dataBit2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        dataBit2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        dataBit3.setBackground(new java.awt.Color(153, 204, 0));
+        dataBit3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        dataBit3.setToolTipText("");
+        dataBit3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        btnApplyColors.setText("Apply");
+        btnApplyColors.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnApplyColorsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -285,6 +336,16 @@ public class MainFrame extends javax.swing.JFrame {
                         .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnSaveCfg)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dataBit1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dataBit2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dataBit3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnApplyColors)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnResetPeriod))))
         );
@@ -301,7 +362,12 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnResetPeriod)
                     .addComponent(btnSaveCfg)
-                    .addComponent(btnSave))
+                    .addComponent(btnSave)
+                    .addComponent(jLabel1)
+                    .addComponent(dataBit1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dataBit2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dataBit3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnApplyColors))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -361,6 +427,7 @@ public class MainFrame extends javax.swing.JFrame {
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			((Arinc429TableModel)table.getModel()).loadState(fc.getSelectedFile().getPath());
 			updateStatusBar();
+			updateDataBitsColors();
 		}
     }//GEN-LAST:event_btnLoadActionPerformed
 
@@ -373,6 +440,7 @@ public class MainFrame extends javax.swing.JFrame {
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			((Arinc429TableModel)table.getModel()).loadConfig(fc.getSelectedFile().getPath());
 			updateStatusBar();
+			updateDataBitsColors();
 		}
     }//GEN-LAST:event_btnLoadCfgActionPerformed
 
@@ -387,12 +455,33 @@ public class MainFrame extends javax.swing.JFrame {
 		}
     }//GEN-LAST:event_btnSaveCfgActionPerformed
 
+    private void btnApplyColorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyColorsActionPerformed
+        List<DataBitMarker.Entry> colors = new ArrayList<>();
+		addToColors(colors, dataBit1);
+		addToColors(colors, dataBit2);
+		addToColors(colors, dataBit3);
+		((Arinc429TableModel)table.getModel()).setDataBitsColors(colors);
+    }//GEN-LAST:event_btnApplyColorsActionPerformed
+
+	private void addToColors(List<DataBitMarker.Entry> colors, JTextField textField) {
+		try {
+			colors.add(new DataBitMarker.Entry(
+					textField.getText().isEmpty() ? 0 : Integer.parseInt(textField.getText()), 
+					textField.getBackground().getRGB() & 0xFFFFFF));
+		} catch (NumberFormatException ex) {
+			textField.setText("");
+		}
+	}
+	
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLoad;
     private javax.swing.JButton btnLoadCfg;
     private javax.swing.JButton btnOpen;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSaveCfg;
+    private javax.swing.JTextField dataBit1;
+    private javax.swing.JTextField dataBit2;
+    private javax.swing.JTextField dataBit3;
     private javax.swing.JComboBox portName;
     private javax.swing.JLabel statusBar;
     private javax.swing.JTable table;

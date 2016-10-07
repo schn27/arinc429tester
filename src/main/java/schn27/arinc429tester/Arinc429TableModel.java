@@ -61,6 +61,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		periodDetector = new PeriodDetector();
 		referenceTime = Instant.now();
 		convertors = new HashMap<>();
+		dataBitMarker = new DataBitMarker();
 	}
 	
 	@Override
@@ -111,7 +112,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 		case SDI:
 			return getSdiTextFrom(item.tmword.word);
 		case DATA:
-			return getDataTextFrom(item.tmword.word);
+			return dataBitMarker.getHtmlText(getDataTextFrom(item.tmword.word));
 		case SSM:
 			return getSsmTextFrom(item.tmword.word);
 		case PARITY:
@@ -204,7 +205,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 
 	public void saveState(String fileName) {
-		Serializer.saveState(fileName, new State(sequence, new Config(labelFilter, noSdiWords, convertors)));
+		Serializer.saveState(fileName, new State(sequence, new Config(labelFilter, noSdiWords, convertors, dataBitMarker.getColors())));
 	}
 
 	public void loadConfig(String fileName) {
@@ -212,7 +213,16 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 
 	public void saveConfig(String fileName) {
-		Serializer.saveConfig(fileName, new Config(labelFilter, noSdiWords, convertors));
+		Serializer.saveConfig(fileName, new Config(labelFilter, noSdiWords, convertors, dataBitMarker.getColors()));
+	}
+
+	public List<DataBitMarker.Entry> getDataBitsColors() {
+		return dataBitMarker.getColors();
+	}
+	
+	public void setDataBitsColors(List<DataBitMarker.Entry> dataBitsColors) {
+		dataBitMarker.setColors(dataBitsColors);
+		fireTableDataChanged();
 	}
 	
 	private void applyConfig(Config config) {
@@ -220,6 +230,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 			noSdiWords = config.noSdiWords;
 			convertors = config.convertors;
 			setLabelFilter(config.labelFilter);
+			setDataBitsColors(config.colors);
 		}		
 	}
 	
@@ -301,4 +312,5 @@ public class Arinc429TableModel extends AbstractTableModel {
 	private boolean periodModeRange;
 	private Instant referenceTime;
 	private Map<Integer, Convertor> convertors;
+	private DataBitMarker dataBitMarker;
 }
