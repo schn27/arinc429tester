@@ -23,36 +23,27 @@
  */
 package schn27.arinc429tester.serialize;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Map;
-import org.json.simple.Jsonable;
 import schn27.arinc429tester.Convertor;
+import schn27.arinc429tester.DataBitMarker;
 import schn27.arinc429tester.LabelFilter;
 
 /**
  *
  * @author AVIA
  */
-public class Config implements Jsonable {
-	public Config(LabelFilter labelFilter, BitSet noSdiWords, Map<Integer, Convertor> convertors) {
+public class Config {
+	public Config(LabelFilter labelFilter, BitSet noSdiWords, Map<Integer, Convertor> convertors, List<DataBitMarker.Entry> colors) {
 		this.labelFilter = labelFilter;
 		this.noSdiWords = noSdiWords;
 		this.convertors = convertors;
+		this.colors = colors;
 	}
 
-	@Override
-	public String toJson() {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public void toJson(Writer writer) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-	
-	public LabelFilter labelFilter;
-	public BitSet noSdiWords;
-	public Map<Integer, Convertor> convertors;
+	public final LabelFilter labelFilter;
+	public final BitSet noSdiWords;
+	public final Map<Integer, Convertor> convertors;
+	public final List<DataBitMarker.Entry> colors;
 }

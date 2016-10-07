@@ -171,6 +171,23 @@ public class MainFrame extends javax.swing.JFrame {
 		btnOpen.setText(reader == null ? "Open" : "Close");		
 	}
 	
+	private void updateDataBitsColors() {
+		List<DataBitMarker.Entry> colors = ((Arinc429TableModel)table.getModel()).getDataBitsColors();
+		
+		JTextField dataBits[] = {dataBit1, dataBit2, dataBit3};
+		
+		for (JTextField dataBit : dataBits) {
+			dataBit.setText("");
+		}
+		
+		try {
+			for (int i = 0; i < dataBits.length; ++i) {
+				dataBits[i].setText(colors.get(i).bitNumber > 0 ? Integer.toString(colors.get(i).bitNumber) : "");
+			}
+		} catch (IndexOutOfBoundsException ex) {
+		}
+	}
+	
 	private static String addExtension(String fileName, String extension) {
 		return fileName.endsWith(extension) ? fileName : fileName + extension;
 	}
@@ -410,6 +427,7 @@ public class MainFrame extends javax.swing.JFrame {
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			((Arinc429TableModel)table.getModel()).loadState(fc.getSelectedFile().getPath());
 			updateStatusBar();
+			updateDataBitsColors();
 		}
     }//GEN-LAST:event_btnLoadActionPerformed
 
@@ -422,6 +440,7 @@ public class MainFrame extends javax.swing.JFrame {
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			((Arinc429TableModel)table.getModel()).loadConfig(fc.getSelectedFile().getPath());
 			updateStatusBar();
+			updateDataBitsColors();
 		}
     }//GEN-LAST:event_btnLoadCfgActionPerformed
 
@@ -445,12 +464,12 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnApplyColorsActionPerformed
 
 	private void addToColors(List<DataBitMarker.Entry> colors, JTextField textField) {
-		if (!textField.getText().isEmpty()) {
-			try {
-				colors.add(new DataBitMarker.Entry(Integer.parseInt(textField.getText()), textField.getBackground().getRGB() & 0xFFFFFF));
-			} catch (NumberFormatException ex) {
-				textField.setText("");
-			}
+		try {
+			colors.add(new DataBitMarker.Entry(
+					textField.getText().isEmpty() ? 0 : Integer.parseInt(textField.getText()), 
+					textField.getBackground().getRGB() & 0xFFFFFF));
+		} catch (NumberFormatException ex) {
+			textField.setText("");
 		}
 	}
 	

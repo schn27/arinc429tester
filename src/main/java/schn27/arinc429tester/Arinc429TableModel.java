@@ -205,7 +205,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 
 	public void saveState(String fileName) {
-		Serializer.saveState(fileName, new State(sequence, new Config(labelFilter, noSdiWords, convertors)));
+		Serializer.saveState(fileName, new State(sequence, new Config(labelFilter, noSdiWords, convertors, dataBitMarker.getColors())));
 	}
 
 	public void loadConfig(String fileName) {
@@ -213,7 +213,11 @@ public class Arinc429TableModel extends AbstractTableModel {
 	}
 
 	public void saveConfig(String fileName) {
-		Serializer.saveConfig(fileName, new Config(labelFilter, noSdiWords, convertors));
+		Serializer.saveConfig(fileName, new Config(labelFilter, noSdiWords, convertors, dataBitMarker.getColors()));
+	}
+
+	public List<DataBitMarker.Entry> getDataBitsColors() {
+		return dataBitMarker.getColors();
 	}
 	
 	public void setDataBitsColors(List<DataBitMarker.Entry> dataBitsColors) {
@@ -226,6 +230,7 @@ public class Arinc429TableModel extends AbstractTableModel {
 			noSdiWords = config.noSdiWords;
 			convertors = config.convertors;
 			setLabelFilter(config.labelFilter);
+			setDataBitsColors(config.colors);
 		}		
 	}
 	
