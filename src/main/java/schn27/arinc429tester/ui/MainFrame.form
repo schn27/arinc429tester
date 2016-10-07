@@ -56,6 +56,8 @@
                       <Component id="dataBit2" min="-2" pref="26" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="dataBit3" min="-2" pref="26" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="btnApplyColors" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="btnResetPeriod" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -82,6 +84,7 @@
                   <Component id="dataBit1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="dataBit2" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="dataBit3" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnApplyColors" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tableScrollPane" pref="378" max="32767" attributes="0"/>
@@ -253,6 +256,18 @@
           </Border>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnApplyColors">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Apply"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnApplyColorsActionPerformed"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

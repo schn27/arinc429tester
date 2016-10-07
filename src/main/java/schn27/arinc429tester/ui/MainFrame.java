@@ -30,9 +30,12 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.BoundedRangeModel;
 import schn27.arinc429tester.Reader;
 import javax.swing.JFileChooser;
+import javax.swing.JTextField;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -188,6 +191,7 @@ public class MainFrame extends javax.swing.JFrame {
         dataBit1 = new javax.swing.JTextField();
         dataBit2 = new javax.swing.JTextField();
         dataBit3 = new javax.swing.JTextField();
+        javax.swing.JButton btnApplyColors = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Arinc429Tester");
@@ -283,6 +287,13 @@ public class MainFrame extends javax.swing.JFrame {
         dataBit3.setToolTipText("");
         dataBit3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
+        btnApplyColors.setText("Apply");
+        btnApplyColors.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnApplyColorsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -313,6 +324,8 @@ public class MainFrame extends javax.swing.JFrame {
                         .addComponent(dataBit2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(dataBit3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnApplyColors)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnResetPeriod))))
         );
@@ -333,7 +346,8 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(dataBit1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(dataBit2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dataBit3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(dataBit3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnApplyColors))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -419,6 +433,24 @@ public class MainFrame extends javax.swing.JFrame {
 		}
     }//GEN-LAST:event_btnSaveCfgActionPerformed
 
+    private void btnApplyColorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyColorsActionPerformed
+        Map<Integer, Integer> colors = new HashMap<>();
+		addToColors(colors, dataBit1);
+		addToColors(colors, dataBit2);
+		addToColors(colors, dataBit3);
+		((Arinc429TableModel)table.getModel()).setDataBitsColors(colors);
+    }//GEN-LAST:event_btnApplyColorsActionPerformed
+
+	private void addToColors(Map<Integer, Integer> colors, JTextField textField) {
+		if (!textField.getText().isEmpty()) {
+			try {
+				colors.put(Integer.parseInt(textField.getText()), textField.getBackground().getRGB() & 0xFFFFFF);
+			} catch (NumberFormatException ex) {
+				textField.setText("");
+			}
+		}
+	}
+	
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLoad;
     private javax.swing.JButton btnLoadCfg;
