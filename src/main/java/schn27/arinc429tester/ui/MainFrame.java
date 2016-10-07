@@ -184,6 +184,10 @@ public class MainFrame extends javax.swing.JFrame {
         btnSaveCfg = new javax.swing.JButton();
         btnLoad = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        dataBit1 = new javax.swing.JTextField();
+        dataBit2 = new javax.swing.JTextField();
+        dataBit3 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Arinc429Tester");
@@ -263,6 +267,22 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("Data bits");
+
+        dataBit1.setBackground(new java.awt.Color(153, 204, 255));
+        dataBit1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        dataBit1.setToolTipText("");
+        dataBit1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        dataBit2.setBackground(new java.awt.Color(255, 153, 153));
+        dataBit2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        dataBit2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        dataBit3.setBackground(new java.awt.Color(153, 204, 0));
+        dataBit3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        dataBit3.setToolTipText("");
+        dataBit3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -285,6 +305,14 @@ public class MainFrame extends javax.swing.JFrame {
                         .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnSaveCfg)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dataBit1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dataBit2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dataBit3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnResetPeriod))))
         );
@@ -301,7 +329,11 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(portName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnResetPeriod)
                     .addComponent(btnSaveCfg)
-                    .addComponent(btnSave))
+                    .addComponent(btnSave)
+                    .addComponent(jLabel1)
+                    .addComponent(dataBit1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dataBit2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dataBit3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -393,6 +425,9 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnOpen;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSaveCfg;
+    private javax.swing.JTextField dataBit1;
+    private javax.swing.JTextField dataBit2;
+    private javax.swing.JTextField dataBit3;
     private javax.swing.JComboBox portName;
     private javax.swing.JLabel statusBar;
     private javax.swing.JTable table;
