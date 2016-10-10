@@ -2,7 +2,7 @@
 
 ## Инструкция
 
-Для запуска требуется установить JRE8 (http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
+Для запуска требуется установить [JRE8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
 
 Чтобы поиграться можно выбрать Fake в качестве порта  – это случайный генератор слов.
 
