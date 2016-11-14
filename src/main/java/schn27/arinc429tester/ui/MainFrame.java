@@ -388,7 +388,7 @@ public class MainFrame extends javax.swing.JFrame {
 						reader = null;
 						updateOpenedState();
 					}),
-					!SerialFactory.isTimedSerial((String)portName.getSelectedItem())
+					false
 			);
 			(new Thread(reader)).start();
 		} else {
