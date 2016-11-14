@@ -45,6 +45,8 @@ import schn27.arinc429tester.Arinc429TableModel;
 import schn27.arinc429tester.DataBitMarker;
 import schn27.arinc429tester.SerialFactory;
 import schn27.arinc429tester.TimeMarkedArinc429Word;
+import schn27.arinc429tester.binary.RawSerialReader;
+import schn27.arinc429tester.binary.LogSerialReader;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -422,10 +424,26 @@ public class MainFrame extends javax.swing.JFrame {
 		JFileChooser fc = new JFileChooser();
 		fc.setAcceptAllFileFilterUsed(false);
 		fc.addChoosableFileFilter(new FileNameExtensionFilter("JSON", "json"));
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("Raw", "raw"));
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("Log", "log"));
 		fc.setDialogTitle("Load from");
 		
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			((Arinc429TableModel)table.getModel()).loadState(fc.getSelectedFile().getPath());
+			Arinc429TableModel m = (Arinc429TableModel)table.getModel();
+			String fileName = fc.getSelectedFile().getPath();
+			
+			switch (fc.getFileFilter().getDescription().toLowerCase()) {
+				case "json":
+					m.loadState(fileName);
+					break;
+				case "raw":
+					m.loadBinary(fileName, new RawSerialReader());
+					break;
+				case "log":
+					m.loadBinary(fileName, new LogSerialReader());
+					break;					
+			}
+			
 			updateStatusBar();
 			updateDataBitsColors();
 		}
