@@ -23,7 +23,7 @@
  */
 package schn27.arinc429tester;
 
-import schn27.arinc429tester.serialize.Serializer;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -33,9 +33,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
+import schn27.arinc429tester.binary.SerialReader;
 import schn27.arinc429tester.serialize.Config;
 import schn27.arinc429tester.serialize.State;
+import schn27.serial.NotAvailableException;
+import schn27.arinc429tester.binary.ReadFilePort;
+import schn27.arinc429tester.serialize.Serializer;
 
 /**
  *
@@ -196,6 +203,31 @@ public class Arinc429TableModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 	
+	public void loadBinary(String fileName, SerialReader reader) {
+		sequence.clear();
+		filteredSequence.clear();
+		ReadFilePort serial = new ReadFilePort(fileName);
+		
+		try {
+			serial.open();
+			while (!serial.eof()) {
+				sequence.put(new SequenceItem(new TimeMarkedArinc429Word(Instant.MIN, reader.read(serial, 10))));
+			}
+		} catch(TimeoutException | NotAvailableException | InterruptedException ex) {
+		} catch (IOException ex) {
+			Logger.getLogger(Arinc429TableModel.class.getName()).log(Level.SEVERE, null, ex);
+		} finally {
+			try {
+				serial.close();
+			} catch (IOException ex) {
+				Logger.getLogger(Arinc429TableModel.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
+		
+		fireTableStructureChanged();
+		sequence.getList().forEach((item) -> putToFilteredSequence(item));
+	}
+	
 	public void loadState(String fileName) {
 		State state = Serializer.loadState(fileName);
 		if (state != null) {
@@ -312,5 +344,5 @@ public class Arinc429TableModel extends AbstractTableModel {
 	private boolean periodModeRange;
 	private Instant referenceTime;
 	private Map<Integer, Convertor> convertors;
-	private DataBitMarker dataBitMarker;
+	private final DataBitMarker dataBitMarker;
 }

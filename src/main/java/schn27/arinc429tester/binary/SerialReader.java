@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2016 Aleksandr Malikov <schn27@gmail.com>.
@@ -21,32 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package schn27.arinc429tester;
+package schn27.arinc429tester.binary;
 
-import java.util.List;
-import schn27.serial.Com;
+import java.util.concurrent.TimeoutException;
+import schn27.arinc429tester.Arinc429Word;
+import schn27.serial.NotAvailableException;
 import schn27.serial.Serial;
 
 /**
  *
- * @author amalikov
+ * @author Aleksandr Malikov <schn27@gmail.com>
  */
-public final class SerialFactory {
-	private final static String fakePortName = "Fake";
-	
-	private SerialFactory() {}
-	
-	public final static Serial create(String name) {
-		if (name.equals(fakePortName)) {
-			return new FakePort();
-		} else {
-			return new Com(name, 230400);
-		}
-	}
-	
-	public final static List<String> getList() {
-		List<String> list = Com.getList();
-		list.add(fakePortName);
-		return list;
-	}
+public interface SerialReader {
+	Arinc429Word read(Serial serial, int timeout) throws InterruptedException, TimeoutException, NotAvailableException;
 }

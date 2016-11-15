@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package schn27.arinc429tester;
+package schn27.arinc429tester.binary;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -44,6 +44,7 @@ public class ReadFilePort implements Serial {
 	public void open() throws IOException, NotAvailableException {
 		try {
 			in = new BufferedInputStream(new FileInputStream(name));
+			available = in.available();
 		} catch (FileNotFoundException ex) {
 			throw new NotAvailableException("File not found");
 		}
@@ -54,15 +55,18 @@ public class ReadFilePort implements Serial {
 		if (in != null) {
 			in.close();
 			in = null;
+			available = 0;
 		}
 	}
 
 	@Override
 	public int read(byte[] buffer, int ofs, int size, int timeout) throws InterruptedException, NotAvailableException {
 		try {
-			if (in == null || in.available() <= 0) {
+			if (in == null || eof()) {
 				throw new NotAvailableException();
 			}
+			
+			available -= size;
 			return in.read(buffer, ofs, size);
 		} catch (IOException ex) {
 			throw new NotAvailableException();
@@ -71,13 +75,18 @@ public class ReadFilePort implements Serial {
 
 	@Override
 	public void write(byte[] buffer, int ofs, int size) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException("Read only");
 	}
 
 	@Override
 	public void clean() {
 	}
 	
+	public boolean eof() {
+		return available <= 0;
+	}
+	
 	private final String name;
 	private InputStream in;
+	private int available;
 }
